@@ -140,6 +140,7 @@ body {
   right: 145px;
 }
 .content .search-stats input#search {
+  font-family: 'Poppins', Arial, sans-serif;
   width: 175px;
   margin-right: 0;
   margin-bottom: 0;
