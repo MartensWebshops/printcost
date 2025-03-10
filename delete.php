@@ -44,7 +44,7 @@ if (!empty($_POST)) {
         <form action="delete.php?id=<?=$id?>&type=<?=$type?>&page=<?=$page?>" method="post">
             <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
             <div class="button-span">
-                <input type="submit" value="Verwijderen" class="delete-btn">
+                <input type="submit" value="Verwijderen" class="trash">
                 <a href="<?= $type === 'product' ? 'index.php' : 'filaments.php' ?>?page=<?=$page?>" class="back">Annuleren</a>
             </div>
         </form>

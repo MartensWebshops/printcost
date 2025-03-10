@@ -238,6 +238,10 @@ body {
 }
 .read table tbody tr {
   border-bottom: 1px solid #d3dae0;
+  cursor: pointer;
+}
+.read table tbody tr:hover {
+  background-color: #f9f9f9;
 }
 .read table tbody tr td {
   padding: 10px;
@@ -276,7 +280,7 @@ body {
 }
 .update form div {
   display: flex;
-  gap: 20px;
+  gap: 5px;
 }
 .update form input[type=text],
 .read form input,
@@ -329,7 +333,7 @@ body {
 }
 .update form input[type="submit"],
 .update form .back,
-.delete .yesno .back {
+.delete form .back {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -347,7 +351,7 @@ body {
   margin-bottom: 0;
 }
 .update form .trash,
-.delete .yesno .trash {
+.delete form .trash {
   display: flex;
   align-items: center;
   justify-content: center;

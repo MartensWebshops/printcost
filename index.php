@@ -22,8 +22,8 @@ $total_records = $pdo->query('SELECT COUNT(*) FROM productprintcosts')->fetchCol
         <div class="hamburger-menu" data-menu>
             <span class="hamburger-icon"><i class='bx bx-menu'></i></span>
             <div class="dropdown-content">
-                <a href="create.php?page=<?=$page?>">Nieuwe Calculatie</a>
                 <a href="index.php?page=<?=$page?>">Overzicht</a>
+                <a href="create.php?page=<?=$page?>">Nieuwe Calculatie</a>
                 <a href="filaments.php?page=<?=$page?>">Filamenten</a>
             </div>
         </div>
@@ -48,7 +48,6 @@ $total_records = $pdo->query('SELECT COUNT(*) FROM productprintcosts')->fetchCol
                 <th>Printprijs (€)</th>
                 <th>Verkoopprijs (€)</th>
                 <th>Aangemaakt</th>
-                <th>Actie</th>
             </tr>
         </thead>
         <tbody>
@@ -60,7 +59,6 @@ $total_records = $pdo->query('SELECT COUNT(*) FROM productprintcosts')->fetchCol
                 <td>€<?=number_format($product['printprijs'], 2)?></td>
                 <td>€<?=number_format($product['verkoopprijs'], 2)?></td>
                 <td><?=date('d-m-Y', strtotime($product['aangemaakt']))?></td>
-                <td><a href="delete.php?id=<?=$product['id']?>&type=product&page=<?=$page?>" class="delete-link">Verwijderen</a></td>
             </tr>
             <?php endforeach; ?>
         </tbody>

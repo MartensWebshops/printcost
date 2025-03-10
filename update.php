@@ -123,6 +123,7 @@ if (!empty($_POST)) {
                 <div class="button-span">
                     <input type="submit" value="Opslaan">
                     <a href="index.php?page=<?=$page?>" class="back">Terug</a>
+                    <a href="delete.php?id=<?=$id?>&type=product&page=<?=$page?>" class="trash">Verwijderen</a>
                 </div>
             </div>
         </section>
