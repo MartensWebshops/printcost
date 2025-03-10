@@ -133,7 +133,7 @@ body {
   display: flex;
   align-items: center;
   height: 30px;
-  gap: 20px;
+  gap: 10px;
 }
 .content .search-stats {
   position: absolute;
