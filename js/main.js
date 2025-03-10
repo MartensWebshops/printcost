@@ -150,4 +150,46 @@ $(document).ready(function() {
     $('#createForm, #editProductForm, #editFilamentForm').on('keydown', function(e) {
         if (e.key === 'Enter') e.preventDefault();
     });
+
+    // Cost value update handling
+    $('.cost-value').on('input', function() {
+        const $input = $(this);
+        const originalValue = $input.data('original-value');
+        const currentValue = $input.val();
+        const $updateBtn = $input.siblings('.update-btn');
+
+        if (currentValue !== originalValue) {
+            $updateBtn.show();
+        } else {
+            $updateBtn.hide();
+        }
+    });
+
+    $('.inline-update-form').on('submit', function(e) {
+        e.preventDefault();
+        const $form = $(this);
+        const $input = $form.find('.cost-value');
+        const $updateBtn = $form.find('.update-btn');
+        const $row = $form.closest('tr');
+        
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $input.data('original-value', response.cost_value);
+                    $input.val(response.cost_value); // Ensure formatted value is shown
+                    $row.find('.date-updated').text(response.date_updated);
+                    $updateBtn.hide();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function() {
+                alert('Fout bij het bijwerken van de kosten.');
+            }
+        });
+    });
 });

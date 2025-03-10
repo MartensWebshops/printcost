@@ -187,6 +187,7 @@ body {
 }
 .dropdown-content a:hover {
   background-color: #f1f1f1;
+  border-radius: 0 0 5px 5px;
 }
 .show {
   display: block; /* Show when toggled */
@@ -237,6 +238,7 @@ body {
   font-size: 12px;
 }
 .read table tbody tr {
+  height: 40px;
   border-bottom: 1px solid #d3dae0;
   cursor: pointer;
 }
@@ -289,7 +291,6 @@ body {
   font-size: 12px;
   border-radius: 5px;
   padding: 0 10px;
-  margin-bottom: 20px;
   height: 30px;
   color: var(--color-text);
   border: 2px solid #eeeeee;
@@ -552,7 +553,6 @@ section .bx {
 
 /* INLINE FORM */
 
-/* Inline form within table */
 .inline-form {
   display: flex;
   flex-wrap: wrap;
@@ -580,4 +580,31 @@ section .bx {
 }
 .inline-form input[type="submit"] {
   margin: 0;
+}
+
+/* COSTS */
+
+.inline-update-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cost-value {
+  width: 100px;
+  margin: 0;
+}
+.cost-unit {
+  font-size: 0.9em;
+  color: #555;
+}
+.update-btn {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.update-btn:hover {
+  background-color: #0056b3;
 }
