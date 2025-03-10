@@ -27,6 +27,7 @@ $total_records = $pdo->query('SELECT COUNT(*) FROM productprintcosts')->fetchCol
                 <a href="filaments.php?page=<?=$page?>">Filamenten</a>
             </div>
         </div>
+        <h2>Overzicht</h2>
         <div class="search-stats">
             <form method="POST" action="">
                 <div class="search-container">

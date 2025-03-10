@@ -27,6 +27,8 @@
 }
 
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
   font-size: 12px;
@@ -131,7 +133,7 @@ body {
   display: flex;
   align-items: center;
   height: 30px;
-  gap: 5px;
+  gap: 20px;
 }
 .content .search-stats {
   position: absolute;
@@ -160,9 +162,8 @@ body {
 
 .hamburger-menu {
   position: relative;
-  display: inline-block;
 }
-.hamburger-icon {
+.hamburger-icon i {
   font-size: 20px;
   cursor: pointer;
   padding: 10px;
@@ -228,27 +229,6 @@ body {
   background-color: #ebeef1;
   padding: 8px;
   border-bottom: 1px solid #d3dae0;
-}
-.read table .col-artikelnaam {
-  width: 300px;
-}
-.read table .col-gewicht {
-  width: 100px;
-}
-.read table .col-print-tijd {
-  width: 120px;
-}
-.read table .col-print-prijs {
-  width: 100px;
-}
-.read table .col-verkoop-prijs {
-  width: 120px;
-}
-.read table .col-kleur {
-  width: 260px;
-}
-.read table .col-aangemaakt {
-  width: 100px;
 }
 .read table thead td {
   padding: 10px;
@@ -508,6 +488,15 @@ section .bx {
   background-color: #ddd;
   color: var(--color-text);
   border: 1px solid #ddd;
+}
+.pagination .prev,
+.pagination .next {
+    padding: 8px;
+    font-size: 20px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .pagination a.prev, .pagination a.next {
   background-color: #f1f1f1;

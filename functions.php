@@ -117,7 +117,7 @@ function verify_csrf_token($token) {
 }
 
 /**
- * Generates pagination links.
+ * Generates pagination links with Boxicons chevrons.
  * @param int $page Current page
  * @param int $total_records Total records
  * @param int $records_per_page Records per page
@@ -130,7 +130,7 @@ function generate_pagination($page, $total_records, $records_per_page, $base_url
 
     $html = '<div class="pagination">';
     if ($page > 1) {
-        $html .= "<a href='$base_url?page=" . ($page - 1) . "' class='prev'>Vorige</a>";
+        $html .= "<a href='$base_url?page=" . ($page - 1) . "' class='prev'><i class='bx bx-chevron-left'></i></a>";
     }
 
     $start = max(1, $page - 2);
@@ -141,7 +141,7 @@ function generate_pagination($page, $total_records, $records_per_page, $base_url
     }
 
     if ($page < $total_pages) {
-        $html .= "<a href='$base_url?page=" . ($page + 1) . "' class='next'>Volgende</a>";
+        $html .= "<a href='$base_url?page=" . ($page + 1) . "' class='next'><i class='bx bx-chevron-right'></i></a>";
     }
     $html .= '</div>';
     return $html;
