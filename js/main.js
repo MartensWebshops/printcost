@@ -151,6 +151,21 @@ $(document).ready(function() {
         if (e.key === 'Enter') e.preventDefault();
     });
 
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const $toast = $('<div class="toast"></div>').text(message).addClass(type);
+        $('.toast-container').append($toast);
+        
+        // Show toast
+        setTimeout(() => $toast.addClass('show'), 10); // Small delay for transition
+        
+        // Hide and remove toast after 3 seconds
+        setTimeout(() => {
+            $toast.removeClass('show');
+            setTimeout(() => $toast.remove(), 300); // Match transition duration
+        }, 3000);
+    }
+
     // Cost value update handling
     $('.cost-value').on('input', function() {
         const $input = $(this);
@@ -180,15 +195,16 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     $input.data('original-value', response.cost_value);
-                    $input.val(response.cost_value); // Ensure formatted value is shown
+                    $input.val(response.cost_value);
                     $row.find('.date-updated').text(response.date_updated);
                     $updateBtn.hide();
+                    showToast(response.message, 'success');
                 } else {
-                    alert(response.message);
+                    showToast(response.message, 'error');
                 }
             },
             error: function() {
-                alert('Fout bij het bijwerken van de kosten.');
+                showToast('Fout bij het bijwerken van de kosten.', 'error');
             }
         });
     });

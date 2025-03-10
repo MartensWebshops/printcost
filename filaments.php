@@ -142,7 +142,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
     <div id="editModal" class="modal">
         <div class="modal-content">
             <span class="close"><i class='bx bx-x'></i></span>
-            <h3>Filament Bewerken</h3>
+            <h2>Filament Bewerken</h2>
             <form action="filaments.php?page=<?=$page?>" method="post" id="editFilamentForm">
                 <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
                 <input type="hidden" name="update_id" id="edit_id">
@@ -178,12 +178,12 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                 </div>
                 <div class="button-span" id="editFilamentButtons">
                     <input type="submit" value="Opslaan">
-                    <button type="button" class="close-btn">Annuleren</button>
-                    <button type="button" class="delete-btn" id="deleteFilamentBtn">Verwijderen</button>
+                    <button type="button" class="back">Annuleren</button>
+                    <button type="button" class="trash" id="deleteFilamentBtn">Verwijderen</button>
                 </div>
                 <div class="button-span" id="confirmFilamentButtons" style="display: none;">
-                    <input type="submit" value="Ja, verwijder" class="delete-btn">
-                    <button type="button" class="close-btn" id="cancelFilamentDelete">Nee, annuleren</button>
+                    <input type="submit" value="Ja" class="trash">
+                    <button type="button" class="back" id="cancelFilamentDelete">Nee</button>
                 </div>
             </form>
         </div>
