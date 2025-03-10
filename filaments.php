@@ -83,44 +83,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
     </div>
     <?=get_flash_message()?>
 
-    <div class="create-filament">
-        <h2>Nieuw Filament Toevoegen</h2>
-        <form action="filaments.php?page=<?=$page?>" method="post">
-            <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
-            <div class="form-section">
-                <div>
-                    <label for="brand">Merk *</label>
-                    <input type="text" class="big" id="brand" name="brand" placeholder="Bijv. Prusa" required>
-                </div>
-                <div>
-                    <label for="name">Naam *</label>
-                    <input type="text" class="big" id="name" name="name" placeholder="Bijv. PLA" required>
-                </div>
-                <div>
-                    <label for="type">Type *</label>
-                    <input type="text" class="big" id="type" name="type" placeholder="Bijv. Standard" required>
-                </div>
-                <div>
-                    <label for="color">Kleur</label>
-                    <input type="text" class="big" id="color" name="color" placeholder="Bijv. Rood">
-                </div>
-                <div>
-                    <label for="weight">Gewicht (g) *</label>
-                    <input type="number" class="big" id="weight" name="weight" min="1" placeholder="Bijv. 1000" required>
-                </div>
-                <div>
-                    <label for="price">Prijs per gram (€) *</label>
-                    <input type="number" class="big" id="price" name="price" step="0.01" min="0.01" placeholder="Bijv. 0.03" required>
-                </div>
-                <div class="button-span">
-                    <input type="submit" value="Toevoegen">
-                    <a href="index.php?page=<?=$page?>" class="back">Terug</a>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <?php if (empty($filaments)): ?>
+    <?php if (empty($filaments) && !$total_records): ?>
         <p>Geen filamenten gevonden.</p>
     <?php else: ?>
         <table>
@@ -132,10 +95,27 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                     <th>Kleur</th>
                     <th>Gewicht (g)</th>
                     <th>Prijs per gram (€)</th>
-                    <th>Datum toegevoegd</th>
                 </tr>
             </thead>
             <tbody>
+                <tr class="create-filament-row">
+                    <td colspan="6">
+                        <form action="filaments.php?page=<?=$page?>" method="post">
+                            <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
+                            <div class="form-section inline-form">
+                                <input type="text" class="big" name="brand" placeholder="Merk *" required>
+                                <input type="text" class="big" name="name" placeholder="Naam *" required>
+                                <input type="text" class="big" name="type" placeholder="Type *" required>
+                                <input type="text" class="big" name="color" placeholder="Kleur">
+                                <input type="number" class="big" name="weight" min="1" placeholder="Gewicht (g) *" required>
+                                <div class="form-row">
+                                    <input type="number" class="big" name="price" step="0.01" min="0.01" placeholder="Prijs (€) *" required>
+                                    <input type="submit" value="Toevoegen">
+                                </div>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
                 <?php foreach ($filaments as $filament): ?>
                     <tr class="filament-row" 
                         data-id="<?=$filament['id']?>" 
@@ -151,7 +131,6 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                         <td><?=htmlspecialchars($filament['color'] ?: 'N/A')?></td>
                         <td><?=htmlspecialchars($filament['weight'])?>gr</td>
                         <td>€<?=number_format($filament['price'], 2)?></td>
-                        <td><?=date('d-m-Y', strtotime($filament['date_added']))?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
