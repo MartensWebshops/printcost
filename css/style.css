@@ -198,6 +198,7 @@ body {
 .read .search-contact,
 .read form input[type="submit"],
 .read form .back {
+  font-family: 'Poppins', Arial, sans-serif;
   display: inline-block;
   text-decoration: none;
   outline: 0;
@@ -284,6 +285,7 @@ body {
 .update form input[type=text],
 .read form input,
 .update form select {
+  font-family: 'Poppins', Arial, sans-serif;
   font-size: 12px;
   border-radius: 5px;
   padding: 0 10px;
@@ -556,7 +558,14 @@ section .bx {
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-  padding: 10px;
+  padding: 10px 0;
+}
+.create-filament-row {
+  font-family: 'Poppins', Arial, sans-serif;
+  background-color: var(--color-white) !important;
+}
+.create-filament-row td {
+  padding: 0 !important;
 }
 .inline-form input[type="text"],
 .inline-form input[type="number"] {
