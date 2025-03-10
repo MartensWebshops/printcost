@@ -3,6 +3,7 @@ $(document).ready(function() {
     const $searchInput = $('#search');
     const $clearButton = $('.clear-search');
     const $showList = $('#show-list');
+    const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
     let searchTimeout;
 
     $searchInput.on('input', function() {
@@ -13,7 +14,7 @@ $(document).ready(function() {
         if (query) {
             searchTimeout = setTimeout(() => {
                 $.ajax({
-                    url: 'search.php',
+                    url: `index.php?page=${currentPage}`,
                     method: 'POST',
                     data: { query },
                     success: response => $showList.html(response),
@@ -31,9 +32,11 @@ $(document).ready(function() {
 
     $showList.on('click', 'a', function(e) {
         e.preventDefault();
-        $searchInput.val($(this).text());
-        $showList.empty();
-        window.location.href = $(this).attr('href');
+        const $row = $(`.product-row[data-id="${$(this).data('id')}"]`);
+        if ($row.length) {
+            $row.trigger('click');
+            $showList.empty();
+        }
     });
 
     // Hamburger menu
@@ -50,32 +53,101 @@ $(document).ready(function() {
     });
 
     // Filament edit modal
-    const $modal = $('#editModal');
+    const $filamentModal = $('#editModal');
     $('.filament-row').on('click', function() {
-        $('#edit_id').val($(this).data('id'));
-        $('#edit_brand').val($(this).data('brand'));
-        $('#edit_name').val($(this).data('name'));
-        $('#edit_type').val($(this).data('type'));
-        $('#edit_color').val($(this).data('color'));
-        $('#edit_weight').val($(this).data('weight'));
-        $('#edit_price').val($(this).data('price'));
-        $modal.show();
+        const $row = $(this);
+        $('#edit_id').val($row.data('id'));
+        $('#edit_brand').val($row.data('brand'));
+        $('#edit_name').val($row.data('name'));
+        $('#edit_type').val($row.data('type'));
+        $('#edit_color').val($row.data('color'));
+        $('#edit_weight').val($row.data('weight'));
+        $('#edit_price').val($row.data('price'));
+        $('#delete_filament_id').val($row.data('id'));
+
+        // Reset modal to edit mode
+        $('#editFilamentFields').show();
+        $('#editFilamentButtons').show();
+        $('#deleteFilamentConfirm').hide();
+        $('#confirmFilamentButtons').hide();
+
+        $filamentModal.show();
     });
 
-    $('.close, .close-btn').on('click', () => $modal.hide());
-    $(window).on('click', e => {
-        if (e.target === $modal[0]) $modal.hide();
+    // Filament delete confirmation
+    $('#deleteFilamentBtn').on('click', function() {
+        $('#editFilamentFields').hide();
+        $('#editFilamentButtons').hide();
+        $('#deleteFilamentConfirm').show();
+        $('#confirmFilamentButtons').show();
     });
 
-    // Clickable rows in index
-    $('.clickable-row').on('click', function(e) {
-        if (e.target.className !== 'delete-link') {
-            window.location.href = $(this).data('href');
-        }
+    $('#cancelFilamentDelete').on('click', function() {
+        $('#editFilamentFields').show();
+        $('#editFilamentButtons').show();
+        $('#deleteFilamentConfirm').hide();
+        $('#confirmFilamentButtons').hide();
+    });
+
+    // Product edit modal
+    const $productModal = $('#editProductModal');
+    $('.product-row').on('click', function() {
+        const $row = $(this);
+        $('#edit_product_id').val($row.data('id'));
+        $('#edit_artikelnaam').val($row.data('artikelnaam'));
+        $('#edit_gewicht').val($row.data('gewicht'));
+        $('#edit_printtijd').val($row.data('printtijd'));
+        $('#edit_printprijs').val($row.data('printprijs'));
+        $('#edit_verkoopprijs').val($row.data('verkoopprijs'));
+        $('#edit_idnummer2').val($row.data('idnummer2'));
+        $('#edit_idnummer3').val($row.data('idnummer3'));
+        $('#edit_idnummer4').val($row.data('idnummer4'));
+        $('#edit_idnummer5').val($row.data('idnummer5'));
+        $('#edit_idnummer6').val($row.data('idnummer6'));
+        $('#edit_idnummer7').val($row.data('idnummer7'));
+        $('#edit_idnummer8').val($row.data('idnummer8'));
+        $('#edit_orderaantal').val($row.data('orderaantal'));
+        $('#edit_aantal_afwijkend').val($row.data('aantal_afwijkend'));
+        $('#edit_geconstateerde_afwijking').val($row.data('geconstateerde_afwijking'));
+        $('#delete_product_id').val($row.data('id'));
+        
+        // Reset modal to edit mode
+        $('#editFormFields').show();
+        $('#editButtons').show();
+        $('#deleteConfirm').hide();
+        $('#confirmButtons').hide();
+        
+        $productModal.show();
+    });
+
+    // Product delete confirmation
+    $('#deleteProductBtn').on('click', function() {
+        $('#editFormFields').hide();
+        $('#editButtons').hide();
+        $('#deleteConfirm').show();
+        $('#confirmButtons').show();
+    });
+
+    $('#cancelDelete').on('click', function() {
+        $('#editFormFields').show();
+        $('#editButtons').show();
+        $('#deleteConfirm').hide();
+        $('#confirmButtons').hide();
+    });
+
+    // Modal close handlers
+    $('.close, .close-btn').on('click', function() {
+        $filamentModal.hide();
+        $productModal.hide();
+    });
+
+    $(window).on('click', function(e) {
+        if (e.target === $filamentModal[0]) $filamentModal.hide();
+        if (e.target === $productModal[0]) $productModal.hide();
     });
 
     // Prevent Enter key submission in forms
-    $('#createForm, #updateForm').on('keydown', function(e) {
+    $('#createForm, #editProductForm, #editFilamentForm').on('keydown', function(e) {
         if (e.key === 'Enter') e.preventDefault();
     });
 });
