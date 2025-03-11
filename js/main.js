@@ -11,6 +11,18 @@ $(document).ready(function() {
         }, 3000);
     }
 
+    // Sidebar toggle
+    $('.toggle-btn').on('click', function(e) {
+        e.stopPropagation();
+        $('.sidebar').toggleClass('active');
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.sidebar, .toggle-btn').length && $('.sidebar').hasClass('active')) {
+            $('.sidebar').removeClass('active');
+        }
+    });
+
     // Search functionality
     const $searchInput = $('#search');
     const $clearButton = $('.clear-search');
@@ -51,18 +63,97 @@ $(document).ready(function() {
         }
     });
 
-    // Hamburger menu
-    const $hamburgerMenus = $('[data-menu]');
-    $hamburgerMenus.on('click', '.hamburger-icon', function(e) {
-        e.stopPropagation();
-        $(this).siblings('.dropdown-content').toggleClass('show');
-    });
+    // MQTT for printer.php
+    if (typeof printerConfig !== 'undefined') {
+        const client = new Paho.MQTT.Client(printerConfig.printerIp, 8883, 'webapp_' + Math.random().toString(16).substr(2, 8));
 
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('[data-menu]').length) {
-            $('.dropdown-content').removeClass('show');
-        }
-    });
+        client.onConnectionLost = function(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.error('MQTT Connection Lost:', responseObject.errorMessage);
+                document.getElementById('printer-status').textContent = 'Verbindingsfout';
+                showToast('Verbinding met printer verloren!', 'error');
+            }
+        };
+
+        client.onMessageArrived = function(message) {
+            try {
+                const data = JSON.parse(message.payloadString);
+                document.getElementById('printer-status').textContent = data.print?.print_state || 'Idle';
+                document.getElementById('bed-temp').textContent = data.print?.bed_temper || 'N/A';
+                document.getElementById('nozzle-temp').textContent = data.print?.nozzle_temper || 'N/A';
+                document.getElementById('progress').textContent = data.print?.gcode_state === 'RUNNING' ? `${Math.round(data.print.mc_percent)}%` : '0%';
+            } catch (e) {
+                console.error('Error parsing MQTT message:', e);
+            }
+        };
+
+        client.connect({
+            userName: 'bblp',
+            password: printerConfig.accessCode,
+            useSSL: true,
+            onSuccess: function() {
+                console.log('Connected to MQTT');
+                client.subscribe(`device/${printerConfig.deviceSerial}/report`);
+                const message = new Paho.MQTT.Message(JSON.stringify({ 
+                    print: { command: 'pushall', sequence_id: '1' }
+                }));
+                message.destinationName = `device/${printerConfig.deviceSerial}/request`;
+                client.send(message);
+            },
+            onFailure: function(err) {
+                console.error('MQTT Connection Failed:', err.errorMessage);
+                showToast('Kon geen verbinding maken met de printer!', 'error');
+            }
+        });
+
+        // Handle printer form submission
+        $('#printerForm').on('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const fileInput = document.getElementById('gcode_file');
+            const file = fileInput.files[0];
+
+            $.ajax({
+                url: `printer.php?page=${printerConfig.page}`,
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                dataType: 'json',
+                success: function(response) {
+                    if (!response.success) {
+                        showToast(response.message, 'error');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const fileContent = e.target.result;
+                        const payload = JSON.stringify({
+                            print: {
+                                command: 'pushall',
+                                filename: response.file_name,
+                                file: btoa(fileContent),
+                                sequence_id: Math.random().toString(36).substr(2)
+                            }
+                        });
+
+                        const message = new Paho.MQTT.Message(payload);
+                        message.destinationName = `device/${printerConfig.deviceSerial}/request`;
+                        client.send(message);
+                        showToast('Bestand succesvol verzonden naar de printer!', 'success');
+                    };
+                    reader.onerror = function() {
+                        showToast('Fout bij het lezen van het bestand!', 'error');
+                    };
+                    reader.readAsBinaryString(file);
+                },
+                error: function() {
+                    showToast('Er ging iets mis bij het valideren!', 'error');
+                }
+            });
+        });
+    }
 
     // Filament edit modal
     const $filamentModal = $('#editModal');
@@ -209,7 +300,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     showToast(response.message, 'success');
-                    setTimeout(() => window.location.reload(), 1000); // Reload after toast
+                    setTimeout(() => window.location.reload(), 1000);
                 } else {
                     showToast(response.message, 'error');
                 }

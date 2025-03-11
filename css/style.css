@@ -168,18 +168,6 @@ i.bx {
   height: 30px;
   gap: 10px;
 }
-.content .search-stats {
-  position: absolute;
-  display: flex;
-  width: 175px;
-  right: 145px;
-}
-.content .search-stats input#search {
-  font-family: 'Poppins', Arial, sans-serif;
-  width: 175px;
-  margin-right: 0;
-  margin-bottom: 0;
-}
 .footer {
   display: flex;
   align-items: center;
@@ -466,6 +454,19 @@ section .bx {
 
 /* SEARCH BAR */
 
+.content .search-stats {
+  display: flex;
+  width: 175px;
+  margin-left: auto; 
+  margin-right: 0;
+}
+.content .search-stats input#search {
+  font-family: 'Poppins', sans-serif;
+  width: 175px;
+  margin-right: 0;
+  margin-bottom: 0;
+}
+
 .search-container {
   position: relative;
   display: inline-block;
@@ -473,10 +474,10 @@ section .bx {
 }
 .clear-search {
   position: absolute;
-  right: 10px;
+  right: 5px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 16px;
+  font-size: 14px;
   color: #888;
   cursor: pointer;
   display: none;
@@ -686,4 +687,98 @@ section .bx {
 }
 .toast.error {
   background-color: rgba(195,40,96,1);
+}
+
+/* SIDEBAR */
+
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background: var(--color-white);
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  height: 100%;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.sidebar-header h2 {
+  font-size: 20px;
+  color: var(--color-text);
+}
+
+.toggle-btn {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-text);
+  display: none;
+}
+
+.sidebar-nav {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-nav li {
+  margin-bottom: 15px;
+}
+
+.sidebar-nav a {
+  text-decoration: none;
+  color: var(--color-text);
+  font-size: 13;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: var(--color-button-blue);
+  color: var(--color-white);
+}
+
+.sidebar-nav i {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.main-content {
+  margin-left: 250px;
+  flex-grow: 1;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+      width: 0;
+      overflow: hidden;
+      padding: 0;
+  }
+
+  .sidebar.active {
+      width: 250px;
+      padding: 20px;
+  }
+
+  .toggle-btn {
+      display: block;
+  }
+
+  .main-content {
+      margin-left: 0;
+  }
 }

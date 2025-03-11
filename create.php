@@ -56,6 +56,7 @@ if (!empty($_POST)) {
                 <a href="create.php?page=<?=$page?>">Nieuwe Calculatie</a>
                 <a href="filaments.php?page=<?=$page?>">Filamenten</a>
                 <a href="costs.php?page=<?=$page?>">Kosten</a>
+                <a href="printer.php?page=<?=$page?>">Printer Beheer</a>
             </div>
         </div>
         <h2>Nieuwe Calculatie</h2>
