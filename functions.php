@@ -30,8 +30,9 @@ function template_header($title) {
         <link rel="preload" href="fonts/poppins-regular.woff2" as="font" type="font/woff2" crossorigin>
         <link rel="preload" href="fonts/poppins-medium.woff2" as="font" type="font/woff2" crossorigin>
         <link rel="preload" href="fonts/poppins-semibold.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="fonts/boxicons.woff2" as="font" type="font/woff2" crossorigin>
         <link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+        <link rel="stylesheet" href="css/boxicons.min.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="js/main.js"></script>
     </head>

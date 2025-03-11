@@ -1,4 +1,9 @@
 @font-face {
+  font-family: boxicons;
+  font-weight: 400;
+  src: url('../fonts/boxicons.woff2') format('woff2');
+}
+@font-face {
   font-family: 'Poppins';
   src: url('../fonts/poppins-regular.woff2') format('woff2');
   font-weight: 400;
@@ -52,13 +57,21 @@
   box-sizing: border-box;
 }
 body {
-  font-family: 'Poppins', Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 12px;
   margin: 0;
   color: var(--color-text);
   background: var(--color-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+i.bx {
+  font-family: 'boxicons' !important; /* Ensure it uses Boxicons font */
+  font-size: 20px; /* Match Boxicons default */
+  font-weight: 400;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
 }
 .container {
   display: flex;
@@ -184,7 +197,7 @@ body {
 .hamburger-menu {
   position: relative;
 }
-.hamburger-icon i {
+.hamburger-icon i.bx {
   font-size: 20px;
   cursor: pointer;
   padding: 10px;
