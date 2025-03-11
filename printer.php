@@ -43,11 +43,11 @@ if (!empty($_POST) && isset($_POST['upload_file'])) {
             <i class='bx bx-menu toggle-btn'></i>
         </div>
         <ul class="sidebar-nav">
-            <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i> Overzicht</a></li>
-            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i> Nieuwe Calculatie</a></li>
-            <li><a href="filaments.php?page=<?=$page?>"><i class='bx bx-color-fill'></i> Filamenten</a></li>
-            <li><a href="costs.php?page=<?=$page?>"><i class='bx bx-dollar'></i> Kosten</a></li>
-            <li><a href="printer.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'printer.php' ? 'active' : '' ?>"><i class='bx bx-printer'></i> Printer Beheer</a></li>
+            <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
+            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i><span>Nieuwe Calculatie</span></a></li>
+            <li><a href="filaments.php?page=<?=$page?>"><i class='bx bx-color-fill'></i><span>Filamenten</span></a></li>
+            <li><a href="costs.php?page=<?=$page?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
+            <li><a href="printer.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'printer.php' ? 'active' : '' ?>"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
         </ul>
     </aside>
 

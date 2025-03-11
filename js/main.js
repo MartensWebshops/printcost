@@ -11,15 +11,15 @@ $(document).ready(function() {
         }, 3000);
     }
 
-    // Sidebar toggle
+    // Sidebar toggle - Sidebar starts expanded, toggle adds/removes .collapsed
     $('.toggle-btn').on('click', function(e) {
         e.stopPropagation();
-        $('.sidebar').toggleClass('active');
+        $('.sidebar').toggleClass('collapsed');
     });
 
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('.sidebar, .toggle-btn').length && $('.sidebar').hasClass('active')) {
-            $('.sidebar').removeClass('active');
+        if (!$(e.target).closest('.sidebar, .toggle-btn').length && !$('.sidebar').hasClass('collapsed')) {
+            $('.sidebar').addClass('collapsed');
         }
     });
 

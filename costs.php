@@ -39,60 +39,69 @@ if (!empty($_POST) && isset($_POST['cost_id']) && isset($_POST['cost_value'])) {
 
 <?=template_header('Costs')?>
 
-<div class="nav"></div>
-<div class="content read">
-    <div class="create-article">
-        <div class="hamburger-menu" data-menu>
-            <span class="hamburger-icon"><i class='bx bx-menu'></i></span>
-            <div class="dropdown-content">
-                <a href="index.php?page=<?=$page?>">Overzicht</a>
-                <a href="create.php?page=<?=$page?>">Nieuwe Calculatie</a>
-                <a href="filaments.php?page=<?=$page?>">Filamenten</a>
-                <a href="costs.php?page=<?=$page?>">Kosten</a>
-                <a href="printer.php?page=<?=$page?>">Printer Beheer</a>
-            </div>
+<div class="wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Printkosten</h2>
+            <i class='bx bx-menu toggle-btn'></i>
         </div>
-        <h2>Kosten</h2>
-    </div>
+        <ul class="sidebar-nav">
+            <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
+            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i><span>Nieuwe Calculatie</span></a></li>
+            <li><a href="filaments.php?page=<?=$page?>"><i class='bx bx-color-fill'></i><span>Filamenten</span></a></li>
+            <li><a href="costs.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'costs.php' ? 'active' : '' ?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
+            <li><a href="printer.php?page=<?=$page?>"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
+        </ul>
+    </aside>
 
-    <?php if (empty($costs)): ?>
-        <p>Geen kosten gevonden.</p>
-    <?php else: ?>
-        <table>
-            <thead>
-                <tr>
-                    <th>Kostensoort</th>
-                    <th>Waarde (€)</th>
-                    <th>Laatst Bijgewerkt</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($costs as $cost): ?>
-                    <tr data-cost-id="<?=$cost['id']?>">
-                        <td><?=htmlspecialchars($cost['cost_type'])?></td>
-                        <td>
-                            <form action="costs.php?page=<?=$page?>" method="post" class="inline-update-form">
-                                <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
-                                <input type="hidden" name="cost_id" value="<?=$cost['id']?>">
-                                <input type="number" class="big cost-value" name="cost_value" value="<?=number_format($cost['cost_value'], 2)?>" step="0.01" min="0" data-original-value="<?=number_format($cost['cost_value'], 2)?>">
-                                <span class="cost-unit">
-                                    <?php
-                                    if ($cost['cost_type'] === 'Elektriciteit') {
-                                        echo 'per kWh';
-                                    } elseif ($cost['cost_type'] === 'Arbeid' || $cost['cost_type'] === 'Machine Onderhoud') {
-                                        echo 'per uur';
-                                    }
-                                    ?>
-                                </span>
-                                <input type="submit" value="Update" class="update-btn" style="display: none;">
-                            </form>
-                        </td>
-                        <td class="date-updated"><?=date('d-m-Y H:i', strtotime($cost['date_updated']))?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php endif; ?>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content read">
+            <div class="create-article">
+                <h2>Kosten</h2>
+            </div>
+
+            <?php if (empty($costs)): ?>
+                <p>Geen kosten gevonden.</p>
+            <?php else: ?>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kostensoort</th>
+                            <th>Waarde (€)</th>
+                            <th>Laatst Bijgewerkt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($costs as $cost): ?>
+                            <tr data-cost-id="<?=$cost['id']?>">
+                                <td><?=htmlspecialchars($cost['cost_type'])?></td>
+                                <td>
+                                    <form action="costs.php?page=<?=$page?>" method="post" class="inline-update-form">
+                                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
+                                        <input type="hidden" name="cost_id" value="<?=$cost['id']?>">
+                                        <input type="number" class="big cost-value" name="cost_value" value="<?=number_format($cost['cost_value'], 2)?>" step="0.01" min="0" data-original-value="<?=number_format($cost['cost_value'], 2)?>">
+                                        <span class="cost-unit">
+                                            <?php
+                                            if ($cost['cost_type'] === 'Elektriciteit') {
+                                                echo 'per kWh';
+                                            } elseif ($cost['cost_type'] === 'Arbeid' || $cost['cost_type'] === 'Machine Onderhoud') {
+                                                echo 'per uur';
+                                            }
+                                            ?>
+                                        </span>
+                                        <input type="submit" value="Update" class="update-btn" style="display: none;">
+                                    </form>
+                                </td>
+                                <td class="date-updated"><?=date('d-m-Y H:i', strtotime($cost['date_updated']))?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 <?=template_footer()?>
