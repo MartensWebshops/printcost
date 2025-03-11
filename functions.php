@@ -27,11 +27,10 @@ function template_header($title) {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>$title - Printkosten</title>
+        <link rel="preload" href="fonts/poppins-regular.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="fonts/poppins-medium.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="fonts/poppins-semibold.woff2" as="font" type="font/woff2" crossorigin>
         <link rel="stylesheet" href="css/style.css">
-        <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecnFHGPc.woff2" as="font" type="font/woff2" crossorigin>
-        <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLGT9Z1xlFd2JQEk.woff2" as="font" type="font/woff2" crossorigin>
-        <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLEj6Z1xlFd2JQEk.woff2" as="font" type="font/woff2" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="js/main.js"></script>
