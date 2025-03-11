@@ -186,7 +186,7 @@ body {
   display: block;
 }
 .dropdown-content a:hover {
-  background-color: #f1f1f1;
+  background-color: #f1f1f1 !important;
   border-radius: 0 0 5px 5px;
 }
 .show {
@@ -338,6 +338,7 @@ body {
 .update form input[type="submit"],
 .update form .back,
 .delete form .back {
+  font-family: 'Poppins', Arial, sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -429,6 +430,7 @@ section .bx {
 }
 
 /* SEARCH BAR */
+
 .search-container {
   position: relative;
   display: inline-block;

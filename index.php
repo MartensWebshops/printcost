@@ -39,7 +39,9 @@ $total_records = $pdo->query('SELECT COUNT(*) FROM productprintcosts')->fetchCol
 // Handle edit form submission
 if (!empty($_POST) && isset($_POST['update_id'])) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        redirect_with_message("index.php?page=$page", 'Ongeldige CSRF-token', 'error');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Ongeldige CSRF-token']);
+        exit;
     }
 
     $data = sanitize_input($_POST);
@@ -53,7 +55,9 @@ if (!empty($_POST) && isset($_POST['update_id'])) {
     $required = ['artikelnaam'];
 
     if (!validate_required($data, $required) || $data['gewicht'] < 0 || $data['printtijd'] < 0) {
-        redirect_with_message("index.php?page=$page", 'Vul alle verplichte velden in en zorg dat gewicht en printtijd niet negatief zijn!', 'error');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Vul alle verplichte velden in en zorg dat gewicht en printtijd niet negatief zijn!']);
+        exit;
     }
 
     $stmt = $pdo->prepare('UPDATE productprintcosts SET artikelnaam = ?, gewicht = ?, printtijd = ?, printprijs = ?, verkoopprijs = ?, idnummer2 = ?, idnummer3 = ?, idnummer4 = ?, idnummer5 = ?, idnummer6 = ?, idnummer7 = ?, idnummer8 = ?, orderaantal = ?, aantal_afwijkend = ?, geconstateerde_afwijking = ? WHERE id = ?');
@@ -64,19 +68,25 @@ if (!empty($_POST) && isset($_POST['update_id'])) {
         (int)$data['orderaantal'], (int)$data['aantal_afwijkend'], $data['geconstateerde_afwijking'],
         (int)$data['update_id']
     ]);
-    redirect_with_message("index.php?page=$page", 'Product succesvol bijgewerkt!');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Product succesvol bijgewerkt!']);
+    exit;
 }
 
 // Handle delete confirmation
 if (!empty($_POST) && isset($_POST['delete_id'])) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        redirect_with_message("index.php?page=$page", 'Ongeldige CSRF-token', 'error');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Ongeldige CSRF-token']);
+        exit;
     }
 
     $id = (int)$_POST['delete_id'];
     $stmt = $pdo->prepare('DELETE FROM productprintcosts WHERE id = ?');
     $stmt->execute([$id]);
-    redirect_with_message("index.php?page=$page", 'Product succesvol verwijderd!');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Product succesvol verwijderd!']);
+    exit;
 }
 ?>
 
@@ -105,7 +115,6 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
             </form>
         </div>
     </div>
-    <?=get_flash_message()?>
     <table>
         <thead>
             <tr>

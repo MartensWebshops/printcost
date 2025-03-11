@@ -19,7 +19,9 @@ $filaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Handle form submissions (add/update)
 if (!empty($_POST) && isset($_POST['update_id'])) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        redirect_with_message("filaments.php?page=$page", 'Ongeldige CSRF-token', 'error');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Ongeldige CSRF-token']);
+        exit;
     }
 
     $data = sanitize_input($_POST);
@@ -28,15 +30,21 @@ if (!empty($_POST) && isset($_POST['update_id'])) {
     $required = ['brand', 'name', 'type'];
 
     if (!validate_required($data, $required) || $data['weight'] <= 0 || $data['price'] <= 0) {
-        redirect_with_message("filaments.php?page=$page", 'Vul alle verplichte velden in (merk, naam, type, gewicht, prijs per gram)!', 'error');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Vul alle verplichte velden in (merk, naam, type, gewicht, prijs per gram)!']);
+        exit;
     }
 
     $stmt = $pdo->prepare('UPDATE filaments SET brand = ?, name = ?, type = ?, color = ?, weight = ?, price = ? WHERE id = ?');
     $stmt->execute([$data['brand'], $data['name'], $data['type'], $data['color'], (int)$data['weight'], (float)$data['price'], (int)$data['update_id']]);
-    redirect_with_message("filaments.php?page=$page", 'Filament succesvol bijgewerkt!');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Filament succesvol bijgewerkt!']);
+    exit;
 } elseif (!empty($_POST) && !isset($_POST['delete_id'])) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        redirect_with_message("filaments.php?page=$page", 'Ongeldige CSRF-token', 'error');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Ongeldige CSRF-token']);
+        exit;
     }
 
     $data = sanitize_input($_POST);
@@ -45,24 +53,32 @@ if (!empty($_POST) && isset($_POST['update_id'])) {
     $required = ['brand', 'name', 'type'];
 
     if (!validate_required($data, $required) || $data['weight'] <= 0 || $data['price'] <= 0) {
-        redirect_with_message("filaments.php?page=$page", 'Vul alle verplichte velden in (merk, naam, type, gewicht, prijs per gram)!', 'error');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Vul alle verplichte velden in (merk, naam, type, gewicht, prijs per gram)!']);
+        exit;
     }
 
     $stmt = $pdo->prepare('INSERT INTO filaments (brand, name, type, color, weight, price) VALUES (?, ?, ?, ?, ?, ?)');
     $stmt->execute([$data['brand'], $data['name'], $data['type'], $data['color'], (int)$data['weight'], (float)$data['price']]);
-    redirect_with_message("filaments.php?page=$page", 'Filament succesvol toegevoegd!');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Filament succesvol toegevoegd!']);
+    exit;
 }
 
 // Handle delete confirmation
 if (!empty($_POST) && isset($_POST['delete_id'])) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        redirect_with_message("filaments.php?page=$page", 'Ongeldige CSRF-token', 'error');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Ongeldige CSRF-token']);
+        exit;
     }
 
     $id = (int)$_POST['delete_id'];
     $stmt = $pdo->prepare('DELETE FROM filaments WHERE id = ?');
     $stmt->execute([$id]);
-    redirect_with_message("filaments.php?page=$page", 'Filament succesvol verwijderd!');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Filament succesvol verwijderd!']);
+    exit;
 }
 ?>
 
@@ -82,7 +98,6 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
         </div>
         <h2>Filamenten</h2>
     </div>
-    <?=get_flash_message()?>
 
     <?php if (empty($filaments) && !$total_records): ?>
         <p>Geen filamenten gevonden.</p>
@@ -101,7 +116,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
             <tbody>
                 <tr class="create-filament-row">
                     <td colspan="6">
-                        <form action="filaments.php?page=<?=$page?>" method="post">
+                        <form action="filaments.php?page=<?=$page?>" method="post" id="createForm">
                             <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
                             <div class="form-section inline-form">
                                 <input type="text" class="big" name="brand" placeholder="Merk *" required>
@@ -142,7 +157,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
     <div id="editModal" class="modal">
         <div class="modal-content">
             <span class="close"><i class='bx bx-x'></i></span>
-            <h2>Filament Bewerken</h2>
+            <h3>Filament Bewerken</h3>
             <form action="filaments.php?page=<?=$page?>" method="post" id="editFilamentForm">
                 <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
                 <input type="hidden" name="update_id" id="edit_id">

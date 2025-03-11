@@ -1,154 +1,124 @@
 <?php
 session_start();
 
-/**
- * Establishes a PDO connection to the MySQL database.
- * @return PDO Database connection object
- */
+// Connect to MySQL database
 function pdo_connect_mysql() {
-    $host = 'localhost';
-    $user = 'root';
-    $pass = '';
-    $name = 'printcost';
+    $DATABASE_HOST = 'localhost';
+    $DATABASE_USER = 'root';
+    $DATABASE_PASS = '';
+    $DATABASE_NAME = 'printcost';
     try {
-        return new PDO("mysql:host=$host;dbname=$name;charset=utf8", $user, $pass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-        ]);
-    } catch (PDOException $e) {
-        exit('Database connection failed: ' . $e->getMessage());
+        return new PDO('mysql:host=' . $DATABASE_HOST . ';dbname=' . $DATABASE_NAME . ';charset=utf8', $DATABASE_USER, $DATABASE_PASS);
+    } catch (PDOException $exception) {
+        exit('Failed to connect to database!');
     }
 }
 
-/**
- * Generates the HTML header with title and CSRF token.
- * @param string $title Page title
- */
+// Template header, outputs HTML header content
 function template_header($title) {
-    $csrf_token = bin2hex(random_bytes(32));
-    $_SESSION['csrf_token'] = $csrf_token;
+    $title = htmlspecialchars($title);
+    $toast_message = isset($_SESSION['toast_message']) ? json_encode($_SESSION['toast_message']) : 'null';
+    $toast_type = isset($_SESSION['toast_type']) ? json_encode($_SESSION['toast_type']) : 'null';
 
-    echo <<<HTML
+    echo <<<EOT
 <!DOCTYPE html>
 <html lang="nl">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>$title</title>
-    <link href="css/style.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLGT9Z1xlEw.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLEj6Z1xlEw.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css">
-</head>
-<body>
-    <input type="hidden" id="csrf_token" value="$csrf_token">
-HTML;
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>$title - Printkosten</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecnFHGPc.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLGT9Z1xlFd2JQEk.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLEj6Z1xlFd2JQEk.woff2" as="font" type="font/woff2" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="js/main.js"></script>
+    </head>
+    <body>
+    <div class="toast-container"></div>
+    <script>
+        window.addEventListener('load', function() {
+            const toastMessage = $toast_message;
+            const toastType = $toast_type;
+            if (toastMessage !== null) {
+                showToast(toastMessage, toastType || 'success');
+                fetch('clear_toast.php', { method: 'POST' });
+            }
+        });
+    </script>
+EOT;
 }
 
-/**
- * Generates the HTML footer with script includes.
- */
+// Template footer, outputs HTML footer content
 function template_footer() {
-    echo <<<HTML
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script src="js/main.js"></script>
-</body>
+    echo <<<EOT
+    </body>
 </html>
-HTML;
+EOT;
 }
 
-/**
- * Formats minutes into hours and minutes (e.g., "2h 30m").
- * @param int $minutes Total minutes
- * @return string Formatted duration
- */
-function format_duration($minutes) {
-    $hours = floor($minutes / 60);
-    $remaining_minutes = $minutes % 60;
-    return sprintf('%dh %dm', $hours, $remaining_minutes);
+// Sanitize input data to prevent XSS and trim whitespace
+function sanitize_input($data) {
+    return array_map(function($value) {
+        return is_array($value) ? sanitize_input($value) : htmlspecialchars(strip_tags(trim($value)));
+    }, $data);
 }
 
-/**
- * Redirects with a flash message.
- * @param string $url Redirect URL
- * @param string $message Message text
- * @param string $type Message type (success/error)
- */
+// Validate required fields are not empty
+function validate_required($data, $required) {
+    foreach ($required as $field) {
+        if (empty($data[$field])) return false;
+    }
+    return true;
+}
+
+// Redirect with a toast message
 function redirect_with_message($url, $message, $type = 'success') {
-    $_SESSION['flash'] = ['message' => $message, 'type' => $type];
+    $_SESSION['toast_message'] = $message;
+    $_SESSION['toast_type'] = $type;
     header("Location: $url");
     exit;
 }
 
-/**
- * Retrieves and clears the flash message.
- * @return string HTML-formatted message or empty string
- */
+// Legacy flash message function, now unused but kept for compatibility
 function get_flash_message() {
-    if (!isset($_SESSION['flash'])) return '';
-    $flash = $_SESSION['flash'];
-    unset($_SESSION['flash']);
-    return "<p class='flash-{$flash['type']}'>" . htmlspecialchars($flash['message']) . "</p>";
+    return '';
 }
 
-/**
- * Validates required fields in an array.
- * @param array $data Input data
- * @param array $fields Required field names
- * @return bool True if all fields are non-empty
- */
-function validate_required($data, $fields) {
-    return !in_array(true, array_map(fn($field) => empty($data[$field]), $fields));
-}
-
-/**
- * Sanitizes input data by trimming strings.
- * @param array $data Input data
- * @return array Sanitized data
- */
-function sanitize_input($data) {
-    return array_map(fn($value) => is_string($value) ? trim($value) : $value, $data);
-}
-
-/**
- * Verifies CSRF token.
- * @param string $token Submitted token
- * @return bool True if valid
- */
-function verify_csrf_token($token) {
-    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
-}
-
-/**
- * Generates pagination links with Boxicons chevrons.
- * @param int $page Current page
- * @param int $total_records Total records
- * @param int $records_per_page Records per page
- * @param string $base_url Base URL for links
- * @return string HTML pagination links
- */
-function generate_pagination($page, $total_records, $records_per_page, $base_url) {
+// Generate pagination links
+function generate_pagination($current_page, $total_records, $records_per_page, $base_url) {
     $total_pages = ceil($total_records / $records_per_page);
     if ($total_pages <= 1) return '';
-
     $html = '<div class="pagination">';
-    if ($page > 1) {
-        $html .= "<a href='$base_url?page=" . ($page - 1) . "' class='prev'><i class='bx bx-chevron-left'></i></a>";
+    if ($current_page > 1) {
+        $html .= '<a href="' . $base_url . '?page=' . ($current_page - 1) . '">« Vorige</a>';
     }
-
-    $start = max(1, $page - 2);
-    $end = min($total_pages, $page + 2);
-    for ($i = $start; $i <= $end; $i++) {
-        $class = $i == $page ? 'active' : '';
-        $html .= "<a href='$base_url?page=$i' class='$class'>$i</a>";
+    for ($i = 1; $i <= $total_pages; $i++) {
+        $html .= '<a href="' . $base_url . '?page=' . $i . '"' . ($i == $current_page ? ' class="active"' : '') . '>' . $i . '</a>';
     }
-
-    if ($page < $total_pages) {
-        $html .= "<a href='$base_url?page=" . ($page + 1) . "' class='next'><i class='bx bx-chevron-right'></i></a>";
+    if ($current_page < $total_pages) {
+        $html .= '<a href="' . $base_url . '?page=' . ($current_page + 1) . '">Volgende »</a>';
     }
     $html .= '</div>';
     return $html;
 }
+
+// Format duration from minutes to hours and minutes
+function format_duration($minutes) {
+    $hours = floor($minutes / 60);
+    $remaining_minutes = $minutes % 60;
+    return $hours . ' uur ' . $remaining_minutes . ' min';
+}
+
+// Generate CSRF token only if not already set
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// Verify CSRF token
+function verify_csrf_token($token) {
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+?>

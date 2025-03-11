@@ -1,4 +1,16 @@
 $(document).ready(function() {
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const $toast = $('<div class="toast"></div>').text(message).addClass(type);
+        $('.toast-container').append($toast);
+        
+        setTimeout(() => $toast.addClass('show'), 10);
+        setTimeout(() => {
+            $toast.removeClass('show');
+            setTimeout(() => $toast.remove(), 300);
+        }, 3000);
+    }
+
     // Search functionality
     const $searchInput = $('#search');
     const $clearButton = $('.clear-search');
@@ -18,7 +30,7 @@ $(document).ready(function() {
                     method: 'POST',
                     data: { query },
                     success: response => $showList.html(response),
-                    error: () => $showList.html('<div class="search-result">Zoekfout</div>')
+                    error: () => showToast('Zoekfout', 'error')
                 });
             }, 300);
         } else {
@@ -65,7 +77,6 @@ $(document).ready(function() {
         $('#edit_price').val($row.data('price'));
         $('#delete_filament_id').val($row.data('id'));
 
-        // Reset modal to edit mode
         $('#editFilamentFields').show();
         $('#editFilamentButtons').show();
         $('#deleteFilamentConfirm').hide();
@@ -74,7 +85,6 @@ $(document).ready(function() {
         $filamentModal.show();
     });
 
-    // Filament delete confirmation
     $('#deleteFilamentBtn').on('click', function() {
         $('#editFilamentFields').hide();
         $('#editFilamentButtons').hide();
@@ -111,7 +121,6 @@ $(document).ready(function() {
         $('#edit_geconstateerde_afwijking').val($row.data('geconstateerde_afwijking'));
         $('#delete_product_id').val($row.data('id'));
         
-        // Reset modal to edit mode
         $('#editFormFields').show();
         $('#editButtons').show();
         $('#deleteConfirm').hide();
@@ -120,7 +129,6 @@ $(document).ready(function() {
         $productModal.show();
     });
 
-    // Product delete confirmation
     $('#deleteProductBtn').on('click', function() {
         $('#editFormFields').hide();
         $('#editButtons').hide();
@@ -145,26 +153,6 @@ $(document).ready(function() {
         if (e.target === $filamentModal[0]) $filamentModal.hide();
         if (e.target === $productModal[0]) $productModal.hide();
     });
-
-    // Prevent Enter key submission in forms
-    $('#createForm, #editProductForm, #editFilamentForm').on('keydown', function(e) {
-        if (e.key === 'Enter') e.preventDefault();
-    });
-
-    // Toast notification function
-    function showToast(message, type = 'success') {
-        const $toast = $('<div class="toast"></div>').text(message).addClass(type);
-        $('.toast-container').append($toast);
-        
-        // Show toast
-        setTimeout(() => $toast.addClass('show'), 10); // Small delay for transition
-        
-        // Hide and remove toast after 3 seconds
-        setTimeout(() => {
-            $toast.removeClass('show');
-            setTimeout(() => $toast.remove(), 300); // Match transition duration
-        }, 3000);
-    }
 
     // Cost value update handling
     $('.cost-value').on('input', function() {
@@ -205,6 +193,29 @@ $(document).ready(function() {
             },
             error: function() {
                 showToast('Fout bij het bijwerken van de kosten.', 'error');
+            }
+        });
+    });
+
+    // Form submission handlers for create.php, index.php, filaments.php
+    $('#createForm, #editProductForm, #editFilamentForm').on('submit', function(e) {
+        e.preventDefault();
+        const $form = $(this);
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    showToast(response.message, 'success');
+                    setTimeout(() => window.location.reload(), 1000); // Reload after toast
+                } else {
+                    showToast(response.message, 'error');
+                }
+            },
+            error: function() {
+                showToast('Fout bij het verzenden van het formulier.', 'error');
             }
         });
     });

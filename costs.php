@@ -19,14 +19,13 @@ if (!empty($_POST) && isset($_POST['cost_id']) && isset($_POST['cost_value'])) {
     $cost_value = (float)$_POST['cost_value'];
 
     if ($cost_value < 0) {
-        header('Content$bbType: application/json');
+        header('Content-Type: application/json');
         echo json_encode(['success' => false, 'message' => 'Kosten mogen niet negatief zijn!']);
         exit;
     }
 
     $stmt = $pdo->prepare('UPDATE costs SET cost_value = ? WHERE id = ?');
     $stmt->execute([$cost_value, $cost_id]);
-
     header('Content-Type: application/json');
     echo json_encode([
         'success' => true,
@@ -54,8 +53,6 @@ if (!empty($_POST) && isset($_POST['cost_id']) && isset($_POST['cost_value'])) {
         </div>
         <h2>Kosten</h2>
     </div>
-    <?=get_flash_message()?>
-    <div class="toast-container"></div> <!-- Added toast container -->
 
     <?php if (empty($costs)): ?>
         <p>Geen kosten gevonden.</p>
