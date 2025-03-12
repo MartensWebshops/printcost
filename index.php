@@ -96,7 +96,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <h2>Printkosten</h2>
+            <img src="images/zintuigspel_logo.svg" alt="Zintuigspel Logo" class="sidebar-logo">
             <i class='bx bx-menu toggle-btn'></i>
         </div>
         <ul class="sidebar-nav">

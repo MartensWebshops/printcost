@@ -87,19 +87,19 @@ function get_flash_message() {
     return '';
 }
 
-// Generate pagination links
+// Generate pagination links with chevron icons
 function generate_pagination($current_page, $total_records, $records_per_page, $base_url) {
     $total_pages = ceil($total_records / $records_per_page);
     if ($total_pages <= 1) return '';
     $html = '<div class="pagination">';
     if ($current_page > 1) {
-        $html .= '<a href="' . $base_url . '?page=' . ($current_page - 1) . '">« Vorige</a>';
+        $html .= '<a href="' . $base_url . '?page=' . ($current_page - 1) . '" class="prev"><i class="bx bx-chevron-left"></i></a>';
     }
     for ($i = 1; $i <= $total_pages; $i++) {
         $html .= '<a href="' . $base_url . '?page=' . $i . '"' . ($i == $current_page ? ' class="active"' : '') . '>' . $i . '</a>';
     }
     if ($current_page < $total_pages) {
-        $html .= '<a href="' . $base_url . '?page=' . ($current_page + 1) . '">Volgende »</a>';
+        $html .= '<a href="' . $base_url . '?page=' . ($current_page + 1) . '" class="next"><i class="bx bx-chevron-right"></i></a>';
     }
     $html .= '</div>';
     return $html;

@@ -141,7 +141,7 @@ i.bx {
 .read table {
   table-layout: fixed;
   width: 100%;
-  margin: 15px 0;
+  margin: 30px 0 15px 0;
   border-collapse: collapse;
 }
 .read table th {
@@ -609,15 +609,14 @@ section .bx {
   position: relative; /* Allows absolute positioning of toggle-btn */
 }
 
-.sidebar-header h2 {
-  font-size: 20px;
-  color: var(--color-text);
-  white-space: nowrap; /* Prevents wrapping in collapsed state */
+.sidebar-logo {
+  width: 150px; /* Adjust size as needed */
+  height: auto;
   opacity: 1; /* Visible by default */
   transition: opacity 0.3s ease;
 }
 
-.sidebar.collapsed .sidebar-header h2 {
+.sidebar.collapsed .sidebar-logo {
   opacity: 0; /* Hidden when collapsed */
 }
 
@@ -638,7 +637,7 @@ section .bx {
 }
 
 .sidebar-nav li {
-  margin-bottom: 15px;
+  height: 40px;
 }
 
 .sidebar-nav a {
@@ -654,6 +653,7 @@ section .bx {
 }
 
 .sidebar-nav a span {
+  height: 20px;
   margin-left: 10px; /* Space between icon and text */
   opacity: 1; /* Visible by default */
   transition: opacity 0.3s ease;
@@ -664,8 +664,8 @@ section .bx {
 }
 
 .sidebar-nav a:hover, .sidebar-nav a.active {
-  background: var(--color-button-blue);
-  color: var(--color-white);
+  background: #ebeef1;
+  color: var(--color-text);
 }
 
 .sidebar-nav i {
@@ -676,9 +676,9 @@ section .bx {
 .main-content {
   margin-left: 250px; /* Matches default expanded sidebar width */
   flex-grow: 1;
-  padding: 20px 30px;
-  background: var(--color-white);
+  padding: 20px;
   width: calc(100% - 250px); /* Full width minus sidebar */
+  background: var(--color-white); /* Added background */
   transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
