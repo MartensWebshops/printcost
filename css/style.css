@@ -151,6 +151,9 @@ i.bx {
   padding: 8px;
   border-bottom: 1px solid #d3dae0;
 }
+.read table thead tr {
+  height: 40px;
+}
 .read table thead td {
   padding: 10px;
   font-weight: 500;
@@ -605,7 +608,7 @@ section .bx {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 26px;
   position: relative; /* Allows absolute positioning of toggle-btn */
 }
 
