@@ -3,41 +3,21 @@ include 'functions.php';
 $pdo = pdo_connect_mysql();
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 
-// Fetch all costs
-$stmt = $pdo->query('SELECT * FROM costs ORDER BY cost_type');
+$stmt = $pdo->query('SELECT * FROM costs ORDER BY id');
 $costs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Handle update submission
-if (!empty($_POST) && isset($_POST['cost_id']) && isset($_POST['cost_value'])) {
-    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Ongeldige CSRF-token']);
-        exit;
-    }
-
-    $cost_id = (int)$_POST['cost_id'];
-    $cost_value = (float)$_POST['cost_value'];
-
-    if ($cost_value < 0) {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Kosten mogen niet negatief zijn!']);
-        exit;
-    }
-
-    $stmt = $pdo->prepare('UPDATE costs SET cost_value = ? WHERE id = ?');
-    $stmt->execute([$cost_value, $cost_id]);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+    $id = (int)$_POST['id'];
+    $cost_value = floatval($_POST['cost_value']);
+    $stmt = $pdo->prepare('UPDATE costs SET cost_value = ?, date_updated = NOW() WHERE id = ?');
+    $stmt->execute([$cost_value, $id]);
     header('Content-Type: application/json');
-    echo json_encode([
-        'success' => true,
-        'message' => 'Kosten succesvol bijgewerkt!',
-        'cost_value' => number_format($cost_value, 2),
-        'date_updated' => date('d-m-Y H:i')
-    ]);
+    echo json_encode(['success' => true, 'message' => 'Kosten bijgewerkt!', 'cost_value' => $cost_value, 'date_updated' => date('d-m-Y')]);
     exit;
 }
 ?>
 
-<?=template_header('Costs')?>
+<?=template_header('Kosten')?>
 
 <div class="wrapper">
     <!-- Sidebar -->
@@ -48,8 +28,8 @@ if (!empty($_POST) && isset($_POST['cost_id']) && isset($_POST['cost_value'])) {
         </div>
         <ul class="sidebar-nav">
             <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
-            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i><span>Nieuwe Calculatie</span></a></li>
-            <li><a href="filaments.php?page=<?=$page?>"><i class='bx bx-color-fill'></i><span>Filamenten</span></a></li>
+            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i><span>Nieuw Product</span></a></li>
+            <li><a href="filaments.php?page=<?=$page?>"><i class='bx bx-sushi'></i><span>Filamenten</span></a></li>
             <li><a href="costs.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'costs.php' ? 'active' : '' ?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
             <li><a href="printer.php?page=<?=$page?>"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
         </ul>
@@ -57,49 +37,69 @@ if (!empty($_POST) && isset($_POST['cost_id']) && isset($_POST['cost_value'])) {
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="content read">
-            <div class="create-article">
-                <h2>Kosten</h2>
+        <div class="content">
+            <h2>Kosten</h2>
+            <div class="costs-list">
+                <?php
+                $current_section = '';
+                foreach ($costs as $cost):
+                    // Format date_updated to dd-mm-yyyy
+                    $formatted_date = date('d-m-Y', strtotime($cost['date_updated']));
+                    // Define sections and their sub-items
+                    if (in_array($cost['cost_type'], ['Arbeid', 'Energie', 'Printers'])) {
+                        $current_section = $cost['cost_type'];
+                        ?>
+                        <div class="cost-section"><?=$cost['cost_type']?></div>
+                        <?php
+                    } elseif (
+                        ($current_section === 'Arbeid' && in_array($cost['cost_type'], ['Voorbereiding', 'Nabehandeling'])) ||
+                        ($current_section === 'Energie' && $cost['cost_type'] === 'Elektriciteit') ||
+                        ($current_section === 'Printers' && $cost['cost_type'] === 'Onderhoud')
+                    ) {
+                        ?>
+                        <div class="cost-item">
+                            <div class="cost-type"><?=$cost['cost_type']?></div>
+                            <div class="cost-details">
+                                <form class="inline-update-form" action="costs.php?page=<?=$page?>" method="post">
+                                    <input type="hidden" name="id" value="<?=$cost['id']?>">
+                                    <span class="cost-unit">€</span>
+                                    <input type="number" name="cost_value" class="cost-value" value="<?=$cost['cost_value']?>" step="0.01" data-original-value="<?=$cost['cost_value']?>">
+                                    <?php if (in_array($cost['cost_type'], ['Voorbereiding', 'Nabehandeling', 'Onderhoud'])): ?>
+                                        <span class="cost-unit-suffix">per uur</span>
+                                    <?php elseif ($cost['cost_type'] === 'Elektriciteit'): ?>
+                                        <span class="cost-unit-suffix">per kWh</span>
+                                    <?php endif; ?>
+                                    <button type="submit" class="update-btn" style="display: none;">Bijwerken</button>
+                                </form>
+                                <span class="date-updated"><?=$formatted_date?></span>
+                            </div>
+                        </div>
+                        <?php
+                    } else {
+                        $current_section = ''; // Reset if not a recognized section or sub-item
+                        ?>
+                        <div class="cost-item">
+                            <div class="cost-type"><?=$cost['cost_type']?></div>
+                            <div class="cost-details">
+                                <form class="inline-update-form" action="costs.php?page=<?=$page?>" method="post">
+                                    <input type="hidden" name="id" value="<?=$cost['id']?>">
+                                    <span class="cost-unit">€</span>
+                                    <input type="number" name="cost_value" class="cost-value" value="<?=$cost['cost_value']?>" step="0.01" data-original-value="<?=$cost['cost_value']?>">
+                                    <?php if (in_array($cost['cost_type'], ['Voorbereiding', 'Nabehandeling', 'Onderhoud'])): ?>
+                                        <span class="cost-unit-suffix">per uur</span>
+                                    <?php elseif ($cost['cost_type'] === 'Elektriciteit'): ?>
+                                        <span class="cost-unit-suffix">per kWh</span>
+                                    <?php endif; ?>
+                                    <button type="submit" class="update-btn" style="display: none;">Bijwerken</button>
+                                </form>
+                                <span class="date-updated"><?=$formatted_date?></span>
+                            </div>
+                        </div>
+                        <?php
+                    }
+                endforeach;
+                ?>
             </div>
-
-            <?php if (empty($costs)): ?>
-                <p>Geen kosten gevonden.</p>
-            <?php else: ?>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Kostensoort</th>
-                            <th>Waarde (€)</th>
-                            <th>Laatst Bijgewerkt</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($costs as $cost): ?>
-                            <tr data-cost-id="<?=$cost['id']?>">
-                                <td><?=htmlspecialchars($cost['cost_type'])?></td>
-                                <td>
-                                    <form action="costs.php?page=<?=$page?>" method="post" class="inline-update-form">
-                                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
-                                        <input type="hidden" name="cost_id" value="<?=$cost['id']?>">
-                                        <input type="number" class="big cost-value" name="cost_value" value="<?=number_format($cost['cost_value'], 2)?>" step="0.01" min="0" data-original-value="<?=number_format($cost['cost_value'], 2)?>">
-                                        <span class="cost-unit">
-                                            <?php
-                                            if ($cost['cost_type'] === 'Elektriciteit') {
-                                                echo 'per kWh';
-                                            } elseif ($cost['cost_type'] === 'Arbeid' || $cost['cost_type'] === 'Machine Onderhoud') {
-                                                echo 'per uur';
-                                            }
-                                            ?>
-                                        </span>
-                                        <input type="submit" value="Update" class="update-btn" style="display: none;">
-                                    </form>
-                                </td>
-                                <td class="date-updated"><?=date('d-m-Y H:i', strtotime($cost['date_updated']))?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
         </div>
     </div>
 </div>

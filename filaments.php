@@ -93,8 +93,8 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
         </div>
         <ul class="sidebar-nav">
             <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
-            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i><span>Nieuwe Calculatie</span></a></li>
-            <li><a href="filaments.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'filaments.php' ? 'active' : '' ?>"><i class='bx bx-color-fill'></i><span>Filamenten</span></a></li>
+            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i><span>Nieuw Product</span></a></li>
+            <li><a href="filaments.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'filaments.php' ? 'active' : '' ?>"><i class='bx bx-sushi'></i><span>Filamenten</span></a></li>
             <li><a href="costs.php?page=<?=$page?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
             <li><a href="printer.php?page=<?=$page?>"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
         </ul>

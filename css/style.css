@@ -145,7 +145,8 @@ i.bx {
   border-collapse: collapse;
 }
 .read table th {
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   text-align: left;
   background-color: #ebeef1;
   padding: 8px;
@@ -462,11 +463,12 @@ section .bx {
 }
 .modal-content {
     background-color: #fff;
-    margin: 15% auto;
+    margin-top: 80px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
+    width: 100%;
+    max-width: 1000px;
     border-radius: 5px;
 }
 .modal h2 {
@@ -527,29 +529,95 @@ section .bx {
 }
 
 /* COSTS */
+.costs-list {
+  margin-top: 30px;
+}
+
+.cost-section {
+  font-weight: 600;
+  font-size: 14px;
+  height: 40px;
+  padding: 10px;
+  background-color: #ebeef1;
+  border-bottom: 1px solid #d3dae0;
+}
+
+.cost-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  padding: 10px;
+  border-bottom: 1px solid #d3dae0;
+}
+
+.cost-type {
+  flex: 1;
+  min-width: 150px;
+}
+
+.cost-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Spreads form and date apart */
+  flex: 2;
+  width: 100%; /* Ensures it takes full available width */
+}
+
 .inline-update-form {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px; /* Spacing between €, input, and suffix */
 }
-.cost-value {
-  width: 100px;
-  margin: 0;
-}
+
 .cost-unit {
   font-size: 0.9em;
   color: #555;
 }
-.update-btn {
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
+
+.cost-value {
+  width: 100px;
+  padding: 0 10px;
+  margin: 0;
+  border: 2px solid #eeeeee;
+  height: 30px;
   border-radius: 5px;
-  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
 }
+
+.cost-unit-suffix {
+  font-size: 0.9em;
+  color: #555; /* Matches .cost-unit styling */
+}
+
+.update-btn {
+  font-family: 'Poppins', Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background-color: var(--color-button-blue);
+  border: 0;
+  border-radius: 5px;
+  font-weight: 500;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-white);
+  cursor: pointer;
+  height: 30px;
+  padding: 6px 16px;
+  margin-bottom: 0;
+}
+
 .update-btn:hover {
-  background-color: #0056b3;
+  background-color: var(--color-button-blue-hover);
+}
+
+.date-updated {
+  font-size: 0.9em;
+  color: #767779;
+  margin-left: auto; /* Pushes it to the right */
 }
 
 /* TOAST NOTIFICATIONS */
