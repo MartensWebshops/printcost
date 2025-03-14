@@ -108,15 +108,20 @@ i.bx {
 }
 .content .create-article {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   height: 30px;
+  margin-bottom: 30px;
 }
 
 /* BUTTONS */
 .read .create-contact,
 .read .search-contact,
 .read form input[type="submit"],
-.read .modal .back {
+.read .modal .back,
+.btn-add,
+.btn-cancel,
+.btn-save {
   font-family: 'Poppins', Arial, sans-serif;
   display: inline-block;
   text-decoration: none;
@@ -135,13 +140,48 @@ i.bx {
 .read .create-contact:hover,
 .read .search-contact:hover,
 .read form input[type="submit"]:hover,
-.read .modal .back:hover {
+.read .modal .back:hover,
+.btn-add:hover,
+.btn-cancel:hover,
+.btn-save:hover {
   background-color: var(--color-button-blue-hover);
 }
+
+/* MODAL INPUT */
+.modal label {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.modal input[type="text"],
+.modal select,
+.modal textarea {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #eeeeee;
+  border-radius: 5px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.modal input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.modal textarea {
+  resize: vertical; /* Allow vertical resizing only */
+}
+
+/* TABLE */
 .read table {
   table-layout: fixed;
   width: 100%;
-  margin: 30px 0 15px 0;
+  margin-bottom: 15px;
   border-collapse: collapse;
 }
 .read table th {
@@ -316,6 +356,7 @@ i.bx {
 .delete .yesno,
 .button-span {
   display: flex;
+  justify-content: flex-end;
   gap: 5px;
 }
 .return-span {
@@ -354,9 +395,11 @@ section .bx {
 /* SEARCH BAR */
 .content .search-stats {
   display: flex;
-  width: 175px;
-  margin-left: auto; 
+  width: auto; /* Adjusted from fixed 175px */
+  margin-left: auto;
   margin-right: 0;
+  gap: 10px; /* Space between button and search */
+  align-items: center;
 }
 .content .search-stats input#search {
   font-family: 'Poppins', sans-serif;
@@ -450,52 +493,66 @@ section .bx {
   background-color: #ddd;
 }
 
-/* MODAL */
+/* MODALS */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }
+
 .modal-content {
-    background-color: #fff;
-    margin-top: 80px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 20px;
-    width: 100%;
-    max-width: 1000px;
-    border-radius: 5px;
+  position: relative;
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
-.modal h2 {
-  padding-bottom: 10px;
+
+.modal-content .close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  color: #767779;
+  cursor: pointer;
+}
+
+.modal-content h2 {
   margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
 }
-.modal form div:not(.button-span) {
-  margin-bottom: 20px;
+
+.form-group {
+  margin-bottom: 15px;
 }
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+
+.form-row {
+  display: flex;
+  gap: 10px;
 }
-.close:hover,
-.close:focus {
-    color: #000;
-    text-decoration: none;
+
+.form-row .form-group {
+  flex: 1;
 }
-.filament-row {
-    cursor: pointer;
+
+.idnummersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
 }
-.filament-row:hover {
-    background-color: #f5f5f5;
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 /* INLINE FORM */
@@ -623,23 +680,32 @@ section .bx {
 /* TOAST NOTIFICATIONS */
 .toast-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 0;
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Offset by half its width to center */
+  width: auto; /* Let it adjust to content */
+  max-width: 90%; /* Prevent overflow on small screens */
   z-index: 1000;
+  display: flex;
+  flex-direction: column; /* Stack toasts vertically */
+  align-items: center; /* Center toasts horizontally within container */
 }
 .toast {
   padding: 10px 20px;
-  margin-bottom: 10px;
+  margin-bottom: 10px; /* Space between stacked toasts */
   border-radius: 5px;
-  color: white;
+  color: var(--color-white);
   font-size: 0.9em;
   opacity: 0;
-  transform: translateX(100%);
+  transform: translateY(-100%); /* Start above the screen */
   transition: opacity 0.3s ease, transform 0.3s ease;
+  background-color: rgba(88,188,116,1); /* Default success color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
 }
+
 .toast.show {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(20px); /* Slide down to just below the top edge */
 }
 .toast.success {
   background-color: rgba(88,188,116,1);

@@ -6,7 +6,7 @@ $records_per_page = 10;
 $offset = ($page - 1) * $records_per_page;
 
 // Handle AJAX search request
-if (isset($_POST['query']) && !isset($_POST['update_id']) && !isset($_POST['delete_id'])) {
+if (isset($_POST['query']) && !isset($_POST['update_id']) && !isset($_POST['delete_id']) && !isset($_POST['create_product'])) {
     $query = trim($_POST['query']);
     $output = '';
 
@@ -24,6 +24,42 @@ if (isset($_POST['query']) && !isset($_POST['update_id']) && !isset($_POST['dele
         }
     }
     echo $output;
+    exit;
+}
+
+// Handle create product form submission (moved from create.php)
+if (!empty($_POST) && isset($_POST['create_product'])) {
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Ongeldige CSRF-token']);
+        exit;
+    }
+
+    $data = sanitize_input($_POST);
+    $defaults = [
+        'artikelnaam' => '', 'gewicht' => 0, 'printtijd' => 0, 'printprijs' => 0.0, 'verkoopprijs' => 0.0,
+        'idnummer2' => '', 'idnummer3' => '', 'idnummer4' => '', 'idnummer5' => '', 'idnummer6' => '',
+        'idnummer7' => '', 'idnummer8' => '', 'orderaantal' => 0, 'aantal_afwijkend' => 0,
+        'geconstateerde_afwijking' => ''
+    ];
+    $data = array_merge($defaults, $data);
+    $required = ['artikelnaam'];
+
+    if (!validate_required($data, $required) || $data['gewicht'] < 0 || $data['printtijd'] < 0) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Vul alle verplichte velden in!']);
+        exit;
+    }
+
+    $stmt = $pdo->prepare('INSERT INTO productprintcosts (artikelnaam, gewicht, printtijd, printprijs, verkoopprijs, idnummer2, idnummer3, idnummer4, idnummer5, idnummer6, idnummer7, idnummer8, orderaantal, aantal_afwijkend, geconstateerde_afwijking, aangemaakt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())');
+    $stmt->execute([
+        $data['artikelnaam'], (int)$data['gewicht'], (int)$data['printtijd'], (float)$data['printprijs'],
+        (float)$data['verkoopprijs'], $data['idnummer2'], $data['idnummer3'], $data['idnummer4'],
+        $data['idnummer5'], $data['idnummer6'], $data['idnummer7'], $data['idnummer8'],
+        (int)$data['orderaantal'], (int)$data['aantal_afwijkend'], $data['geconstateerde_afwijking']
+    ]);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Product succesvol toegevoegd!']);
     exit;
 }
 
@@ -56,7 +92,7 @@ if (!empty($_POST) && isset($_POST['update_id'])) {
 
     if (!validate_required($data, $required) || $data['gewicht'] < 0 || $data['printtijd'] < 0) {
         header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Vul alle verplichte velden in en zorg dat gewicht en printtijd niet negatief zijn!']);
+        echo json_encode(['success' => false, 'message' => 'Vul alle verplichte velden in!']);
         exit;
     }
 
@@ -101,7 +137,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
         </div>
         <ul class="sidebar-nav">
             <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
-            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i><span>Nieuw Product</span></a></li>
+            <!-- Removed Nieuw Product link -->
             <li><a href="filaments.php?page=<?=$page?>"><i class='bx bx-sushi'></i><span>Filamenten</span></a></li>
             <li><a href="costs.php?page=<?=$page?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
             <li><a href="printer.php?page=<?=$page?>"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
@@ -114,6 +150,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
             <div class="create-article">
                 <h2>Overzicht</h2>
                 <div class="search-stats">
+                    <button id="createProductBtn" class="btn-add">Nieuw Product</button>
                     <form method="POST" action="index.php?page=<?=$page?>">
                         <div class="search-container">
                             <input type="text" class="big" id="search" name="search" placeholder="Zoeken..." autocomplete="off">
@@ -165,6 +202,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
             </table>
             <?=generate_pagination($page, $total_records, $records_per_page, 'index.php')?>
 
+            <!-- Edit Product Modal -->
             <div id="editProductModal" class="modal">
                 <div class="modal-content">
                     <span class="close"><i class='bx bx-x'></i></span>
@@ -246,6 +284,82 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                         <div class="button-span" id="confirmButtons" style="display: none;">
                             <input type="submit" value="Ja" class="trash">
                             <button type="button" class="back" id="cancelDelete">Nee</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Create Product Modal -->
+            <div id="createProductModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">×</span>
+                    <h2>Nieuw Product Toevoegen</h2>
+                    <form action="index.php?page=<?=$page?>" method="post" id="createProductForm">
+                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
+                        <input type="hidden" name="create_product" value="1">
+                        <div class="form-group">
+                            <label for="create_artikelnaam">Artikelnaam *</label>
+                            <input type="text" id="create_artikelnaam" name="artikelnaam" placeholder="Artikelnaam" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="create_gewicht">Gewicht (g)</label>
+                                <input type="number" id="create_gewicht" name="gewicht" min="0" step="1" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="create_printtijd">Printtijd (min)</label>
+                                <input type="number" id="create_printtijd" name="printtijd" min="0" step="1" placeholder="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="create_printprijs">Printprijs (€)</label>
+                                <input type="number" id="create_printprijs" name="printprijs" min="0" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label for="create_verkoopprijs">Verkoopprijs (€)</label>
+                                <input type="number" id="create_verkoopprijs" name="verkoopprijs" min="0" step="0.01" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>ID-nummers</label>
+                            <div class="idnummersGrid">
+                                <input type="text" id="create_idnummer2" name="idnummer2" placeholder="000">
+                                <input type="text" id="create_idnummer3" name="idnummer3" placeholder="000">
+                                <input type="text" id="create_idnummer4" name="idnummer4" placeholder="000">
+                                <input type="text" id="create_idnummer5" name="idnummer5" placeholder="000">
+                                <input type="text" id="create_idnummer6" name="idnummer6" placeholder="000">
+                                <input type="text" id="create_idnummer7" name="idnummer7" placeholder="000">
+                                <input type="text" id="create_idnummer8" name="idnummer8" placeholder="000">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="create_orderaantal">Orderaantal</label>
+                                <select id="create_orderaantal" name="orderaantal">
+                                    <option value="" selected disabled>Selecteer</option>
+                                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                                        <option value="<?=$i?>"><?=$i?></option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="create_aantal_afwijkend">Aantal afwijkend</label>
+                                <select id="create_aantal_afwijkend" name="aantal_afwijkend">
+                                    <option value="" selected disabled>Selecteer</option>
+                                    <?php for ($i = 0; $i <= 8; $i++): ?>
+                                        <option value="<?=$i?>"><?=$i?></option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="create_geconstateerde_afwijking">Geconstateerde afwijking</label>
+                            <textarea id="create_geconstateerde_afwijking" name="geconstateerde_afwijking" rows="4" placeholder="Beschrijf eventuele afwijkingen"></textarea>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn-add">Toevoegen</button>
+                            <button type="button" class="btn-cancel">Annuleren</button>
                         </div>
                     </form>
                 </div>

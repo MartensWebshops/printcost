@@ -236,8 +236,8 @@ $(document).ready(function() {
 
     // Add handler for .back button in edit product modal
     $('#editProductModal .back').on('click', function(e) {
-        e.preventDefault(); // Prevent default link behavior
-        $productModal.hide(); // Hide the modal
+        e.preventDefault();
+        $productModal.hide();
     });
 
     $(window).on('click', function(e) {
@@ -288,8 +288,8 @@ $(document).ready(function() {
         });
     });
 
-    // Form submission handlers for create.php, index.php, filaments.php
-    $('#createForm, #editProductForm, #editFilamentForm').on('submit', function(e) {
+    // Form submission handlers for index.php, filaments.php
+    $('#editProductForm, #editFilamentForm').on('submit', function(e) {
         e.preventDefault();
         const $form = $(this);
         $.ajax({
@@ -307,6 +307,93 @@ $(document).ready(function() {
             },
             error: function() {
                 showToast('Fout bij het verzenden van het formulier.', 'error');
+            }
+        });
+    });
+
+    // Open Create Filament Modal
+    $('#createFilamentBtn').on('click', function() {
+        $('#createFilamentModal').show();
+    });
+
+    // Close Create Filament Modal
+    $('#createFilamentModal .close').on('click', function() {
+        $('#createFilamentModal').hide();
+    });
+
+    // Close Create Filament Modal on outside click
+    $(window).on('click', function(e) {
+        if (e.target === $('#createFilamentModal')[0]) {
+            $('#createFilamentModal').hide();
+        }
+    });
+
+    // Handle Create Filament Form Submission
+    $('#createFilamentForm').on('submit', function(e) {
+        e.preventDefault();
+        const $form = $(this);
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    showToast(response.message, 'success');
+                    $('#createFilamentModal').hide();
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showToast(response.message, 'error');
+                }
+            },
+            error: function() {
+                showToast('Fout bij het toevoegen van filament.', 'error');
+            }
+        });
+    });
+
+    // Open Create Product Modal
+    $('#createProductBtn').on('click', function() {
+        $('#createProductModal').show();
+    });
+
+    // Close Create Product Modal
+    $('#createProductModal .close').on('click', function() {
+        $('#createProductModal').hide();
+    });
+
+    // Close Create Product Modal with Cancel Button
+    $('#createProductModal .btn-cancel').on('click', function() {
+        $('#createProductModal').hide();
+    });
+
+    // Close Create Product Modal on outside click
+    $(window).on('click', function(e) {
+        if (e.target === $('#createProductModal')[0]) {
+            $('#createProductModal').hide();
+        }
+    });
+
+    // Handle Create Product Form Submission
+    $('#createProductForm').on('submit', function(e) {
+        e.preventDefault();
+        const $form = $(this);
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    showToast(response.message, 'success');
+                    $('#createProductModal').hide();
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showToast(response.message, 'error');
+                }
+            },
+            error: function() {
+                showToast('Fout bij het toevoegen van product.', 'error');
             }
         });
     });

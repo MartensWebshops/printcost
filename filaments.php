@@ -105,6 +105,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
         <div class="content read">
             <div class="create-article">
                 <h2>Filamenten</h2>
+                <button id="createFilamentBtn" class="btn-add">Nieuw Filament</button>
             </div>
 
             <?php if (empty($filaments) && !$total_records): ?>
@@ -122,24 +123,6 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="create-filament-row">
-                            <td colspan="6">
-                                <form action="filaments.php?page=<?=$page?>" method="post" id="createForm">
-                                    <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
-                                    <div class="form-section inline-form">
-                                        <input type="text" class="big" name="brand" placeholder="Merk *" required>
-                                        <input type="text" class="big" name="name" placeholder="Naam *" required>
-                                        <input type="text" class="big" name="type" placeholder="Type *" required>
-                                        <input type="text" class="big" name="color" placeholder="Kleur">
-                                        <input type="number" class="big" name="weight" min="1" placeholder="Gewicht (g) *" required>
-                                        <div class="form-row">
-                                            <input type="number" class="big" name="price" step="0.01" min="0.01" placeholder="Prijs (€) *" required>
-                                            <input type="submit" value="Toevoegen">
-                                        </div>
-                                    </div>
-                                </form>
-                            </td>
-                        </tr>
                         <?php foreach ($filaments as $filament): ?>
                             <tr class="filament-row" 
                                 data-id="<?=$filament['id']?>" 
@@ -162,6 +145,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                 <?=generate_pagination($page, $total_records, $records_per_page, 'filaments.php')?>
             <?php endif; ?>
 
+            <!-- Edit Filament Modal -->
             <div id="editModal" class="modal">
                 <div class="modal-content">
                     <span class="close"><i class='bx bx-x'></i></span>
@@ -207,6 +191,45 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                         <div class="button-span" id="confirmFilamentButtons" style="display: none;">
                             <input type="submit" value="Ja" class="trash">
                             <button type="button" class="back" id="cancelFilamentDelete">Nee</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Create Filament Modal -->
+            <div id="createFilamentModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">×</span>
+                    <h3>Nieuw Filament Toevoegen</h3>
+                    <form action="filaments.php?page=<?=$page?>" method="post" id="createFilamentForm">
+                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
+                        <div class="form-group">
+                            <label for="create_brand">Merk *</label>
+                            <input type="text" id="create_brand" name="brand" placeholder="Merk" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="create_name">Naam *</label>
+                            <input type="text" id="create_name" name="name" placeholder="Naam" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="create_type">Type *</label>
+                            <input type="text" id="create_type" name="type" placeholder="Type" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="create_color">Kleur</label>
+                            <input type="text" id="create_color" name="color" placeholder="Kleur">
+                        </div>
+                        <div class="form-group">
+                            <label for="create_weight">Gewicht (g) *</label>
+                            <input type="number" id="create_weight" name="weight" min="1" step="1" placeholder="Gewicht (g)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="create_price">Prijs per gram (€) *</label>
+                            <input type="number" id="create_price" name="price" step="0.01" min="0.01" placeholder="Prijs (€)" required>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn-add">Toevoegen</button>
+                            <button type="button" class="btn-cancel">Annuleren</button>
                         </div>
                     </form>
                 </div>
