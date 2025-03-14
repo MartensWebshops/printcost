@@ -27,7 +27,7 @@ if (isset($_POST['query']) && !isset($_POST['update_id']) && !isset($_POST['dele
     exit;
 }
 
-// Handle create product form submission (moved from create.php)
+// Handle create product form submission
 if (!empty($_POST) && isset($_POST['create_product'])) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
         header('Content-Type: application/json');
@@ -137,7 +137,6 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
         </div>
         <ul class="sidebar-nav">
             <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
-            <!-- Removed Nieuw Product link -->
             <li><a href="filaments.php?page=<?=$page?>"><i class='bx bx-sushi'></i><span>Filamenten</span></a></li>
             <li><a href="costs.php?page=<?=$page?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
             <li><a href="printer.php?page=<?=$page?>"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
@@ -150,7 +149,6 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
             <div class="create-article">
                 <h2>Overzicht</h2>
                 <div class="search-stats">
-                    <button id="createProductBtn" class="btn-add">Nieuw Product</button>
                     <form method="POST" action="index.php?page=<?=$page?>">
                         <div class="search-container">
                             <input type="text" class="big" id="search" name="search" placeholder="Zoeken..." autocomplete="off">
@@ -158,6 +156,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                         </div>
                         <div class="list-group" id="show-list"></div>
                     </form>
+                    <button id="create-product-btn" class="btn-add">Nieuw Product</button>
                 </div>
             </div>
             <table>
@@ -188,8 +187,8 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                         data-idnummer7="<?=htmlspecialchars($product['idnummer7'])?>"
                         data-idnummer8="<?=htmlspecialchars($product['idnummer8'])?>"
                         data-orderaantal="<?=$product['orderaantal']?>"
-                        data-aantal_afwijkend="<?=$product['aantal_afwijkend']?>"
-                        data-geconstateerde_afwijking="<?=htmlspecialchars($product['geconstateerde_afwijking'])?>">
+                        data-aantal-afwijkend="<?=$product['aantal_afwijkend']?>"
+                        data-geconstateerde-afwijking="<?=htmlspecialchars($product['geconstateerde_afwijking'])?>">
                         <td><?=htmlspecialchars($product['artikelnaam'])?></td>
                         <td><?=htmlspecialchars($product['gewicht'])?>gr</td>
                         <td><?=format_duration($product['printtijd'])?></td>
@@ -203,140 +202,149 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
             <?=generate_pagination($page, $total_records, $records_per_page, 'index.php')?>
 
             <!-- Edit Product Modal -->
-            <div id="editProductModal" class="modal">
+            <div id="edit-product-modal" class="modal">
                 <div class="modal-content">
-                    <span class="close"><i class='bx bx-x'></i></span>
-                    <h3>Product Bewerken</h3>
-                    <form action="index.php?page=<?=$page?>" method="post" id="editProductForm">
+                    <span class="close">×</span>
+                    <h2>Product Bewerken</h2>
+                    <form action="index.php?page=<?=$page?>" method="post" id="edit-product-form">
                         <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
-                        <input type="hidden" name="update_id" id="edit_product_id">
-                        <div class="form-section" id="editFormFields">
-                            <div>
-                                <label for="edit_artikelnaam">Artikelnaam *</label>
-                                <input type="text" class="big" id="edit_artikelnaam" name="artikelnaam" required>
+                        <input type="hidden" name="update_id" id="edit-product-id">
+                        <div class="form-group">
+                            <label for="edit-artikelnaam">Artikelnaam *</label>
+                            <input type="text" id="edit-artikelnaam" name="artikelnaam" placeholder="Artikelnaam" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-gewicht">Gewicht (g)</label>
+                                <input type="number" id="edit-gewicht" name="gewicht" min="0" step="1" placeholder="0">
                             </div>
-                            <div class="form-row">
-                                <div>
-                                    <label for="edit_gewicht">Gewicht (g)</label>
-                                    <input type="number" class="big" id="edit_gewicht" name="gewicht" min="0">
-                                </div>
-                                <div>
-                                    <label for="edit_printtijd">Printtijd (min)</label>
-                                    <input type="number" class="big" id="edit_printtijd" name="printtijd" min="0">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div>
-                                    <label for="edit_printprijs">Printprijs (€)</label>
-                                    <input type="number" class="big" id="edit_printprijs" name="printprijs" step="0.01" min="0">
-                                </div>
-                                <div>
-                                    <label for="edit_verkoopprijs">Verkoopprijs (€)</label>
-                                    <input type="number" class="big" id="edit_verkoopprijs" name="verkoopprijs" step="0.01" min="0">
-                                </div>
-                            </div>
-                            <div>
-                                <label>ID-nummers</label>
-                                <div class="idnummersGrid">
-                                    <input type="text" class="big" id="edit_idnummer2" name="idnummer2" placeholder="000">
-                                    <input type="text" class="big" id="edit_idnummer3" name="idnummer3" placeholder="000">
-                                    <input type="text" class="big" id="edit_idnummer4" name="idnummer4" placeholder="000">
-                                    <input type="text" class="big" id="edit_idnummer5" name="idnummer5" placeholder="000">
-                                    <input type="text" class="big" id="edit_idnummer6" name="idnummer6" placeholder="000">
-                                    <input type="text" class="big" id="edit_idnummer7" name="idnummer7" placeholder="000">
-                                    <input type="text" class="big" id="edit_idnummer8" name="idnummer8" placeholder="000">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div>
-                                    <label for="edit_orderaantal">Orderaantal</label>
-                                    <select class="big" id="edit_orderaantal" name="orderaantal">
-                                        <option value="" disabled>Selecteer</option>
-                                        <?php for ($i = 1; $i <= 8; $i++): ?>
-                                            <option value="<?=$i?>"><?=$i?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="edit_aantal_afwijkend">Aantal afwijkend</label>
-                                    <select class="big" id="edit_aantal_afwijkend" name="aantal_afwijkend">
-                                        <option value="" disabled>Selecteer</option>
-                                        <?php for ($i = 0; $i <= 8; $i++): ?>
-                                            <option value="<?=$i?>"><?=$i?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label for="edit_geconstateerde_afwijking">Geconstateerde afwijking</label>
-                                <textarea class="big" id="edit_geconstateerde_afwijking" name="geconstateerde_afwijking" rows="4"></textarea>
+                            <div class="form-group">
+                                <label for="edit-printtijd">Printtijd (min)</label>
+                                <input type="number" id="edit-printtijd" name="printtijd" min="0" step="1" placeholder="0">
                             </div>
                         </div>
-                        <div class="delete-confirm" id="deleteConfirm" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-printprijs">Printprijs (€)</label>
+                                <input type="number" id="edit-printprijs" name="printprijs" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-verkoopprijs">Verkoopprijs (€)</label>
+                                <input type="number" id="edit-verkoopprijs" name="verkoopprijs" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>ID-nummers</label>
+                            <div class="idnummers-grid">
+                                <input type="text" id="edit-idnummer2" name="idnummer2" placeholder="000">
+                                <input type="text" id="edit-idnummer3" name="idnummer3" placeholder="000">
+                                <input type="text" id="edit-idnummer4" name="idnummer4" placeholder="000">
+                                <input type="text" id="edit-idnummer5" name="idnummer5" placeholder="000">
+                                <input type="text" id="edit-idnummer6" name="idnummer6" placeholder="000">
+                                <input type="text" id="edit-idnummer7" name="idnummer7" placeholder="000">
+                                <input type="text" id="edit-idnummer8" name="idnummer8" placeholder="000">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-orderaantal">Orderaantal</label>
+                                <select id="edit-orderaantal" name="orderaantal">
+                                    <option value="" disabled>Selecteer</option>
+                                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                                        <option value="<?=$i?>"><?=$i?></option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-aantal-afwijkend">Aantal afwijkend</label>
+                                <select id="edit-aantal-afwijkend" name="aantal_afwijkend">
+                                    <option value="" disabled>Selecteer</option>
+                                    <?php for ($i = 0; $i <= 8; $i++): ?>
+                                        <option value="<?=$i?>"><?=$i?></option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-geconstateerde-afwijking">Geconstateerde afwijking</label>
+                            <textarea id="edit-geconstateerde-afwijking" name="geconstateerde_afwijking" rows="4" placeholder="Beschrijf eventuele afwijkingen"></textarea>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn-save">Opslaan</button>
+                            <button type="button" class="btn-cancel">Annuleren</button>
+                            <button type="button" class="trash" id="delete-product-btn">Verwijderen</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Product Confirmation Modal -->
+            <div id="delete-product-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">×</span>
+                    <h2>Product Verwijderen</h2>
+                    <form action="index.php?page=<?=$page?>" method="post" id="delete-product-form">
+                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
+                        <input type="hidden" name="delete_id" id="delete-product-id">
+                        <div class="form-group">
                             <p>Weet je zeker dat je dit product wilt verwijderen?</p>
-                            <input type="hidden" name="delete_id" id="delete_product_id">
                         </div>
-                        <div class="button-span" id="editButtons">
-                            <input type="submit" value="Opslaan">
-                            <button type="button" class="back">Terug</button>
-                            <button type="button" class="trash" id="deleteProductBtn">Verwijderen</button>
-                        </div>
-                        <div class="button-span" id="confirmButtons" style="display: none;">
-                            <input type="submit" value="Ja" class="trash">
-                            <button type="button" class="back" id="cancelDelete">Nee</button>
+                        <div class="modal-buttons">
+                            <button type="submit" class="trash">Ja</button>
+                            <button type="button" class="btn-cancel" id="cancel-delete">Nee</button>
                         </div>
                     </form>
                 </div>
             </div>
 
             <!-- Create Product Modal -->
-            <div id="createProductModal" class="modal">
+            <div id="create-product-modal" class="modal">
                 <div class="modal-content">
                     <span class="close">×</span>
                     <h2>Nieuw Product Toevoegen</h2>
-                    <form action="index.php?page=<?=$page?>" method="post" id="createProductForm">
+                    <form action="index.php?page=<?=$page?>" method="post" id="create-product-form">
                         <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
                         <input type="hidden" name="create_product" value="1">
                         <div class="form-group">
-                            <label for="create_artikelnaam">Artikelnaam *</label>
-                            <input type="text" id="create_artikelnaam" name="artikelnaam" placeholder="Artikelnaam" required>
+                            <label for="create-artikelnaam">Artikelnaam *</label>
+                            <input type="text" id="create-artikelnaam" name="artikelnaam" placeholder="Artikelnaam" required>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="create_gewicht">Gewicht (g)</label>
-                                <input type="number" id="create_gewicht" name="gewicht" min="0" step="1" placeholder="0">
+                                <label for="create-gewicht">Gewicht (g)</label>
+                                <input type="number" id="create-gewicht" name="gewicht" min="0" step="1" placeholder="0">
                             </div>
                             <div class="form-group">
-                                <label for="create_printtijd">Printtijd (min)</label>
-                                <input type="number" id="create_printtijd" name="printtijd" min="0" step="1" placeholder="0">
+                                <label for="create-printtijd">Printtijd (min)</label>
+                                <input type="number" id="create-printtijd" name="printtijd" min="0" step="1" placeholder="0">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="create_printprijs">Printprijs (€)</label>
-                                <input type="number" id="create_printprijs" name="printprijs" min="0" step="0.01" placeholder="0.00">
+                                <label for="create-printprijs">Printprijs (€)</label>
+                                <input type="number" id="create-printprijs" name="printprijs" min="0" step="0.01" placeholder="0.00">
                             </div>
                             <div class="form-group">
-                                <label for="create_verkoopprijs">Verkoopprijs (€)</label>
-                                <input type="number" id="create_verkoopprijs" name="verkoopprijs" min="0" step="0.01" placeholder="0.00">
+                                <label for="create-verkoopprijs">Verkoopprijs (€)</label>
+                                <input type="number" id="create-verkoopprijs" name="verkoopprijs" min="0" step="0.01" placeholder="0.00">
                             </div>
                         </div>
                         <div class="form-group">
                             <label>ID-nummers</label>
-                            <div class="idnummersGrid">
-                                <input type="text" id="create_idnummer2" name="idnummer2" placeholder="000">
-                                <input type="text" id="create_idnummer3" name="idnummer3" placeholder="000">
-                                <input type="text" id="create_idnummer4" name="idnummer4" placeholder="000">
-                                <input type="text" id="create_idnummer5" name="idnummer5" placeholder="000">
-                                <input type="text" id="create_idnummer6" name="idnummer6" placeholder="000">
-                                <input type="text" id="create_idnummer7" name="idnummer7" placeholder="000">
-                                <input type="text" id="create_idnummer8" name="idnummer8" placeholder="000">
+                            <div class="idnummers-grid">
+                                <input type="text" id="create-idnummer2" name="idnummer2" placeholder="000">
+                                <input type="text" id="create-idnummer3" name="idnummer3" placeholder="000">
+                                <input type="text" id="create-idnummer4" name="idnummer4" placeholder="000">
+                                <input type="text" id="create-idnummer5" name="idnummer5" placeholder="000">
+                                <input type="text" id="create-idnummer6" name="idnummer6" placeholder="000">
+                                <input type="text" id="create-idnummer7" name="idnummer7" placeholder="000">
+                                <input type="text" id="create-idnummer8" name="idnummer8" placeholder="000">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="create_orderaantal">Orderaantal</label>
-                                <select id="create_orderaantal" name="orderaantal">
+                                <label for="create-orderaantal">Orderaantal</label>
+                                <select id="create-orderaantal" name="orderaantal">
                                     <option value="" selected disabled>Selecteer</option>
                                     <?php for ($i = 1; $i <= 8; $i++): ?>
                                         <option value="<?=$i?>"><?=$i?></option>
@@ -344,8 +352,8 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="create_aantal_afwijkend">Aantal afwijkend</label>
-                                <select id="create_aantal_afwijkend" name="aantal_afwijkend">
+                                <label for="create-aantal-afwijkend">Aantal afwijkend</label>
+                                <select id="create-aantal-afwijkend" name="aantal_afwijkend">
                                     <option value="" selected disabled>Selecteer</option>
                                     <?php for ($i = 0; $i <= 8; $i++): ?>
                                         <option value="<?=$i?>"><?=$i?></option>
@@ -354,8 +362,8 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="create_geconstateerde_afwijking">Geconstateerde afwijking</label>
-                            <textarea id="create_geconstateerde_afwijking" name="geconstateerde_afwijking" rows="4" placeholder="Beschrijf eventuele afwijkingen"></textarea>
+                            <label for="create-geconstateerde-afwijking">Geconstateerde afwijking</label>
+                            <textarea id="create-geconstateerde-afwijking" name="geconstateerde_afwijking" rows="4" placeholder="Beschrijf eventuele afwijkingen"></textarea>
                         </div>
                         <div class="modal-buttons">
                             <button type="submit" class="btn-add">Toevoegen</button>

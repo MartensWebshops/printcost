@@ -44,7 +44,6 @@ if (!empty($_POST) && isset($_POST['upload_file'])) {
         </div>
         <ul class="sidebar-nav">
             <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
-            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i><span>Nieuw Product</span></a></li>
             <li><a href="filaments.php?page=<?=$page?>"><i class='bx bx-sushi'></i><span>Filamenten</span></a></li>
             <li><a href="costs.php?page=<?=$page?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
             <li><a href="printer.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'printer.php' ? 'active' : '' ?>"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
@@ -68,13 +67,13 @@ if (!empty($_POST) && isset($_POST['upload_file'])) {
             </div>
 
             <!-- File Upload Section -->
-            <form action="printer.php?page=<?=$page?>" method="post" enctype="multipart/form-data" id="printerForm">
+            <form action="printer.php?page=<?=$page?>" method="post" enctype="multipart/form-data" id="printer-form">
                 <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
                 <input type="hidden" name="upload_file" value="1">
                 <div class="form-section">
                     <h3>Bestand Verzenden</h3>
-                    <label for="gcode_file">Kies een .gcode-bestand *</label>
-                    <input type="file" class="big" id="gcode_file" name="gcode_file" accept=".gcode" required>
+                    <label for="gcode-file">Kies een .gcode-bestand *</label>
+                    <input type="file" class="big" id="gcode-file" name="gcode_file" accept=".gcode" required>
                     <div class="button-span">
                         <input type="submit" value="Verzenden">
                         <a href="index.php?page=<?=$page?>" class="back">Terug</a>

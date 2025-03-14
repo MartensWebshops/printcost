@@ -8,7 +8,7 @@ $(document).ready(function() {
         setTimeout(() => {
             $toast.removeClass('show');
             setTimeout(() => $toast.remove(), 300);
-        }, 5000);
+        }, 3000);
     }
 
     // Sidebar toggle - Only toggle on button click, stays expanded otherwise
@@ -101,10 +101,10 @@ $(document).ready(function() {
         });
 
         // Handle printer form submission
-        $('#printerForm').on('submit', function(e) {
+        $('#printer-form').on('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
-            const fileInput = document.getElementById('gcode_file');
+            const fileInput = document.getElementById('gcode-file');
             const file = fileInput.files[0];
 
             $.ajax({
@@ -150,99 +150,81 @@ $(document).ready(function() {
     }
 
     // Filament edit modal
-    const $filamentModal = $('#editModal');
+    const $filamentModal = $('#edit-modal');
+    const $deleteFilamentModal = $('#delete-filament-modal');
     $('.filament-row').on('click', function() {
         const $row = $(this);
-        $('#edit_id').val($row.data('id'));
-        $('#edit_brand').val($row.data('brand'));
-        $('#edit_name').val($row.data('name'));
-        $('#edit_type').val($row.data('type'));
-        $('#edit_color').val($row.data('color'));
-        $('#edit_weight').val($row.data('weight'));
-        $('#edit_price').val($row.data('price'));
-        $('#delete_filament_id').val($row.data('id'));
-
-        $('#editFilamentFields').show();
-        $('#editFilamentButtons').show();
-        $('#deleteFilamentConfirm').hide();
-        $('#confirmFilamentButtons').hide();
-
+        $('#edit-id').val($row.data('id'));
+        $('#edit-brand').val($row.data('brand'));
+        $('#edit-name').val($row.data('name'));
+        $('#edit-type').val($row.data('type'));
+        $('#edit-color').val($row.data('color'));
+        $('#edit-weight').val($row.data('weight'));
+        $('#edit-price').val($row.data('price'));
+        $('#delete-filament-id').val($row.data('id')); // Set for delete modal
         $filamentModal.show();
     });
 
-    $('#deleteFilamentBtn').on('click', function() {
-        $('#editFilamentFields').hide();
-        $('#editFilamentButtons').hide();
-        $('#deleteFilamentConfirm').show();
-        $('#confirmFilamentButtons').show();
+    $('#delete-filament-btn').on('click', function() {
+        $filamentModal.hide();
+        $deleteFilamentModal.show();
     });
 
-    $('#cancelFilamentDelete').on('click', function() {
-        $('#editFilamentFields').show();
-        $('#editFilamentButtons').show();
-        $('#deleteFilamentConfirm').hide();
-        $('#confirmFilamentButtons').hide();
+    $('#cancel-filament-delete').on('click', function() {
+        $deleteFilamentModal.hide();
     });
 
     // Product edit modal
-    const $productModal = $('#editProductModal');
+    const $productModal = $('#edit-product-modal');
+    const $deleteProductModal = $('#delete-product-modal');
     $('.product-row').on('click', function() {
         const $row = $(this);
-        $('#edit_product_id').val($row.data('id'));
-        $('#edit_artikelnaam').val($row.data('artikelnaam'));
-        $('#edit_gewicht').val($row.data('gewicht'));
-        $('#edit_printtijd').val($row.data('printtijd'));
-        $('#edit_printprijs').val($row.data('printprijs'));
-        $('#edit_verkoopprijs').val($row.data('verkoopprijs'));
-        $('#edit_idnummer2').val($row.data('idnummer2'));
-        $('#edit_idnummer3').val($row.data('idnummer3'));
-        $('#edit_idnummer4').val($row.data('idnummer4'));
-        $('#edit_idnummer5').val($row.data('idnummer5'));
-        $('#edit_idnummer6').val($row.data('idnummer6'));
-        $('#edit_idnummer7').val($row.data('idnummer7'));
-        $('#edit_idnummer8').val($row.data('idnummer8'));
-        $('#edit_orderaantal').val($row.data('orderaantal'));
-        $('#edit_aantal_afwijkend').val($row.data('aantal_afwijkend'));
-        $('#edit_geconstateerde_afwijking').val($row.data('geconstateerde_afwijking'));
-        $('#delete_product_id').val($row.data('id'));
-        
-        $('#editFormFields').show();
-        $('#editButtons').show();
-        $('#deleteConfirm').hide();
-        $('#confirmButtons').hide();
-        
+        $('#edit-product-id').val($row.data('id'));
+        $('#edit-artikelnaam').val($row.data('artikelnaam'));
+        $('#edit-gewicht').val($row.data('gewicht'));
+        $('#edit-printtijd').val($row.data('printtijd'));
+        $('#edit-printprijs').val($row.data('printprijs'));
+        $('#edit-verkoopprijs').val($row.data('verkoopprijs'));
+        $('#edit-idnummer2').val($row.data('idnummer2'));
+        $('#edit-idnummer3').val($row.data('idnummer3'));
+        $('#edit-idnummer4').val($row.data('idnummer4'));
+        $('#edit-idnummer5').val($row.data('idnummer5'));
+        $('#edit-idnummer6').val($row.data('idnummer6'));
+        $('#edit-idnummer7').val($row.data('idnummer7'));
+        $('#edit-idnummer8').val($row.data('idnummer8'));
+        $('#edit-orderaantal').val($row.data('orderaantal'));
+        $('#edit-aantal-afwijkend').val($row.data('aantal_afwijkend'));
+        $('#edit-geconstateerde-afwijking').val($row.data('geconstateerde_afwijking'));
+        $('#delete-product-id').val($row.data('id')); // Set for delete modal
         $productModal.show();
     });
 
-    $('#deleteProductBtn').on('click', function() {
-        $('#editFormFields').hide();
-        $('#editButtons').hide();
-        $('#deleteConfirm').show();
-        $('#confirmButtons').show();
+    $('#delete-product-btn').on('click', function() {
+        $productModal.hide();
+        $deleteProductModal.show();
     });
 
-    $('#cancelDelete').on('click', function() {
-        $('#editFormFields').show();
-        $('#editButtons').show();
-        $('#deleteConfirm').hide();
-        $('#confirmButtons').hide();
+    $('#cancel-delete').on('click', function() {
+        $deleteProductModal.hide();
     });
 
     // Modal close handlers
-    $('.close, .close-btn').on('click', function() {
-        $filamentModal.hide();
-        $productModal.hide();
+    $('.close').on('click', function() {
+        $(this).closest('.modal').hide();
     });
 
-    // Add handler for .back button in edit product modal
-    $('#editProductModal .back').on('click', function(e) {
-        e.preventDefault();
-        $productModal.hide();
+    // Cancel buttons
+    $('.btn-cancel').on('click', function() {
+        $(this).closest('.modal').hide();
     });
 
     $(window).on('click', function(e) {
         if (e.target === $filamentModal[0]) $filamentModal.hide();
         if (e.target === $productModal[0]) $productModal.hide();
+        if (e.target === $deleteFilamentModal[0]) $deleteFilamentModal.hide();
+        if (e.target === $deleteProductModal[0]) $deleteProductModal.hide();
+        if (e.target === $('#create-filament-modal')[0]) $('#create-filament-modal').hide();
+        if (e.target === $('#create-product-modal')[0]) $('#create-product-modal').hide();
     });
 
     // Cost value update handling
@@ -288,10 +270,12 @@ $(document).ready(function() {
         });
     });
 
-    // Form submission handlers for index.php, filaments.php
-    $('#editProductForm, #editFilamentForm').on('submit', function(e) {
+    // Form submission handlers for edit and delete forms
+    $('#edit-product-form, #edit-filament-form, #delete-product-form, #delete-filament-form').on('submit', function(e) {
         e.preventDefault();
         const $form = $(this);
+        const isDelete = $form.attr('id').includes('delete');
+        
         $.ajax({
             url: $form.attr('action'),
             method: 'POST',
@@ -300,7 +284,19 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     showToast(response.message, 'success');
-                    setTimeout(() => window.location.reload(), 1000);
+                    if (isDelete) {
+                        const id = $form.find('[name="delete_id"]').val();
+                        if ($form.attr('id') === 'delete-filament-form') {
+                            $(`.filament-row[data-id="${id}"]`).remove();
+                            $deleteFilamentModal.hide();
+                        } else {
+                            $(`.product-row[data-id="${id}"]`).remove();
+                            $deleteProductModal.hide();
+                        }
+                    } else {
+                        $form.closest('.modal').hide();
+                        setTimeout(() => window.location.reload(), 1000);
+                    }
                 } else {
                     showToast(response.message, 'error');
                 }
@@ -312,24 +308,22 @@ $(document).ready(function() {
     });
 
     // Open Create Filament Modal
-    $('#createFilamentBtn').on('click', function() {
-        $('#createFilamentModal').show();
+    $('#create-filament-btn').on('click', function() {
+        $('#create-filament-modal').show();
     });
 
     // Close Create Filament Modal
-    $('#createFilamentModal .close').on('click', function() {
-        $('#createFilamentModal').hide();
+    $('#create-filament-modal .close').on('click', function() {
+        $('#create-filament-modal').hide();
     });
 
-    // Close Create Filament Modal on outside click
-    $(window).on('click', function(e) {
-        if (e.target === $('#createFilamentModal')[0]) {
-            $('#createFilamentModal').hide();
-        }
+    // Close Create Filament Modal with Cancel Button
+    $('#create-filament-modal .btn-cancel').on('click', function() {
+        $('#create-filament-modal').hide();
     });
 
     // Handle Create Filament Form Submission
-    $('#createFilamentForm').on('submit', function(e) {
+    $('#create-filament-form').on('submit', function(e) {
         e.preventDefault();
         const $form = $(this);
         $.ajax({
@@ -340,7 +334,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     showToast(response.message, 'success');
-                    $('#createFilamentModal').hide();
+                    $('#create-filament-modal').hide();
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
                     showToast(response.message, 'error');
@@ -353,29 +347,22 @@ $(document).ready(function() {
     });
 
     // Open Create Product Modal
-    $('#createProductBtn').on('click', function() {
-        $('#createProductModal').show();
+    $('#create-product-btn').on('click', function() {
+        $('#create-product-modal').show();
     });
 
     // Close Create Product Modal
-    $('#createProductModal .close').on('click', function() {
-        $('#createProductModal').hide();
+    $('#create-product-modal .close').on('click', function() {
+        $('#create-product-modal').hide();
     });
 
     // Close Create Product Modal with Cancel Button
-    $('#createProductModal .btn-cancel').on('click', function() {
-        $('#createProductModal').hide();
-    });
-
-    // Close Create Product Modal on outside click
-    $(window).on('click', function(e) {
-        if (e.target === $('#createProductModal')[0]) {
-            $('#createProductModal').hide();
-        }
+    $('#create-product-modal .btn-cancel').on('click', function() {
+        $('#create-product-modal').hide();
     });
 
     // Handle Create Product Form Submission
-    $('#createProductForm').on('submit', function(e) {
+    $('#create-product-form').on('submit', function(e) {
         e.preventDefault();
         const $form = $(this);
         $.ajax({
@@ -386,7 +373,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     showToast(response.message, 'success');
-                    $('#createProductModal').hide();
+                    $('#create-product-modal').hide();
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
                     showToast(response.message, 'error');

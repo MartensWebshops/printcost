@@ -93,7 +93,6 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
         </div>
         <ul class="sidebar-nav">
             <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
-            <li><a href="create.php?page=<?=$page?>"><i class='bx bx-plus'></i><span>Nieuw Product</span></a></li>
             <li><a href="filaments.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'filaments.php' ? 'active' : '' ?>"><i class='bx bx-sushi'></i><span>Filamenten</span></a></li>
             <li><a href="costs.php?page=<?=$page?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
             <li><a href="printer.php?page=<?=$page?>"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
@@ -105,7 +104,7 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
         <div class="content read">
             <div class="create-article">
                 <h2>Filamenten</h2>
-                <button id="createFilamentBtn" class="btn-add">Nieuw Filament</button>
+                <button id="create-filament-btn" class="btn-add">Nieuw Filament</button>
             </div>
 
             <?php if (empty($filaments) && !$total_records): ?>
@@ -146,86 +145,95 @@ if (!empty($_POST) && isset($_POST['delete_id'])) {
             <?php endif; ?>
 
             <!-- Edit Filament Modal -->
-            <div id="editModal" class="modal">
+            <div id="edit-modal" class="modal">
                 <div class="modal-content">
-                    <span class="close"><i class='bx bx-x'></i></span>
-                    <h3>Filament Bewerken</h3>
-                    <form action="filaments.php?page=<?=$page?>" method="post" id="editFilamentForm">
+                    <span class="close">×</span>
+                    <h2>Filament Bewerken</h2>
+                    <form action="filaments.php?page=<?=$page?>" method="post" id="edit-filament-form">
                         <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
-                        <input type="hidden" name="update_id" id="edit_id">
-                        <div class="form-section" id="editFilamentFields">
-                            <div>
-                                <label for="edit_brand">Merk *</label>
-                                <input type="text" class="big" id="edit_brand" name="brand" required>
-                            </div>
-                            <div>
-                                <label for="edit_name">Naam *</label>
-                                <input type="text" class="big" id="edit_name" name="name" required>
-                            </div>
-                            <div>
-                                <label for="edit_type">Type *</label>
-                                <input type="text" class="big" id="edit_type" name="type" required>
-                            </div>
-                            <div>
-                                <label for="edit_color">Kleur</label>
-                                <input type="text" class="big" id="edit_color" name="color">
-                            </div>
-                            <div>
-                                <label for="edit_weight">Gewicht (g) *</label>
-                                <input type="number" class="big" id="edit_weight" name="weight" min="1" required>
-                            </div>
-                            <div>
-                                <label for="edit_price">Prijs per gram (€) *</label>
-                                <input type="number" class="big" id="edit_price" name="price" step="0.01" min="0.01" required>
-                            </div>
+                        <input type="hidden" name="update_id" id="edit-id">
+                        <div class="form-group">
+                            <label for="edit-brand">Merk *</label>
+                            <input type="text" id="edit-brand" name="brand" placeholder="Merk" required>
                         </div>
-                        <div class="delete-confirm" id="deleteFilamentConfirm" style="display: none;">
+                        <div class="form-group">
+                            <label for="edit-name">Naam *</label>
+                            <input type="text" id="edit-name" name="name" placeholder="Naam" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-type">Type *</label>
+                            <input type="text" id="edit-type" name="type" placeholder="Type" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-color">Kleur</label>
+                            <input type="text" id="edit-color" name="color" placeholder="Kleur">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-weight">Gewicht (g) *</label>
+                            <input type="number" id="edit-weight" name="weight" min="1" step="1" placeholder="Gewicht (g)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-price">Prijs per gram (€) *</label>
+                            <input type="number" id="edit-price" name="price" step="0.01" min="0.01" placeholder="Prijs (€)" required>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn-save">Opslaan</button>
+                            <button type="button" class="btn-cancel">Annuleren</button>
+                            <button type="button" class="trash" id="delete-filament-btn">Verwijderen</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="delete-filament-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">×</span>
+                    <h2>Filament Verwijderen</h2>
+                    <form action="filaments.php?page=<?=$page?>" method="post" id="delete-filament-form">
+                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
+                        <input type="hidden" name="delete_id" id="delete-filament-id">
+                        <div class="form-group">
                             <p>Weet je zeker dat je dit filament wilt verwijderen?</p>
-                            <input type="hidden" name="delete_id" id="delete_filament_id">
                         </div>
-                        <div class="button-span" id="editFilamentButtons">
-                            <input type="submit" value="Opslaan">
-                            <button type="button" class="back">Annuleren</button>
-                            <button type="button" class="trash" id="deleteFilamentBtn">Verwijderen</button>
-                        </div>
-                        <div class="button-span" id="confirmFilamentButtons" style="display: none;">
-                            <input type="submit" value="Ja" class="trash">
-                            <button type="button" class="back" id="cancelFilamentDelete">Nee</button>
+                        <div class="modal-buttons">
+                            <button type="submit" class="trash">Ja</button>
+                            <button type="button" class="btn-cancel" id="cancel-filament-delete">Nee</button>
                         </div>
                     </form>
                 </div>
             </div>
 
             <!-- Create Filament Modal -->
-            <div id="createFilamentModal" class="modal">
+            <div id="create-filament-modal" class="modal">
                 <div class="modal-content">
                     <span class="close">×</span>
-                    <h3>Nieuw Filament Toevoegen</h3>
-                    <form action="filaments.php?page=<?=$page?>" method="post" id="createFilamentForm">
+                    <h2>Nieuw Filament Toevoegen</h2>
+                    <form action="filaments.php?page=<?=$page?>" method="post" id="create-filament-form">
                         <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token']?>">
                         <div class="form-group">
-                            <label for="create_brand">Merk *</label>
-                            <input type="text" id="create_brand" name="brand" placeholder="Merk" required>
+                            <label for="create-brand">Merk *</label>
+                            <input type="text" id="create-brand" name="brand" placeholder="Merk" required>
                         </div>
                         <div class="form-group">
-                            <label for="create_name">Naam *</label>
-                            <input type="text" id="create_name" name="name" placeholder="Naam" required>
+                            <label for="create-name">Naam *</label>
+                            <input type="text" id="create-name" name="name" placeholder="Naam" required>
                         </div>
                         <div class="form-group">
-                            <label for="create_type">Type *</label>
-                            <input type="text" id="create_type" name="type" placeholder="Type" required>
+                            <label for="create-type">Type *</label>
+                            <input type="text" id="create-type" name="type" placeholder="Type" required>
                         </div>
                         <div class="form-group">
-                            <label for="create_color">Kleur</label>
-                            <input type="text" id="create_color" name="color" placeholder="Kleur">
+                            <label for="create-color">Kleur</label>
+                            <input type="text" id="create-color" name="color" placeholder="Kleur">
                         </div>
                         <div class="form-group">
-                            <label for="create_weight">Gewicht (g) *</label>
-                            <input type="number" id="create_weight" name="weight" min="1" step="1" placeholder="Gewicht (g)" required>
+                            <label for="create-weight">Gewicht (g) *</label>
+                            <input type="number" id="create-weight" name="weight" min="1" step="1" placeholder="Gewicht (g)" required>
                         </div>
                         <div class="form-group">
-                            <label for="create_price">Prijs per gram (€) *</label>
-                            <input type="number" id="create_price" name="price" step="0.01" min="0.01" placeholder="Prijs (€)" required>
+                            <label for="create-price">Prijs per gram (€) *</label>
+                            <input type="number" id="create-price" name="price" step="0.01" min="0.01" placeholder="Prijs (€)" required>
                         </div>
                         <div class="modal-buttons">
                             <button type="submit" class="btn-add">Toevoegen</button>
