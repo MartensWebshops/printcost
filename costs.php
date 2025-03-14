@@ -27,10 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             <i class='bx bx-menu toggle-btn'></i>
         </div>
         <ul class="sidebar-nav">
-            <li><a href="index.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
-            <li><a href="filaments.php?page=<?=$page?>"><i class='bx bx-sushi'></i><span>Filamenten</span></a></li>
-            <li><a href="costs.php?page=<?=$page?>" class="<?= basename($_SERVER['PHP_SELF']) == 'costs.php' ? 'active' : '' ?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
-            <li><a href="printer.php?page=<?=$page?>"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
+            <li><a href="index.php" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>"><i class='bx bx-home'></i><span>Overzicht</span></a></li>
+            <li><a href="filaments.php"><i class='bx bx-sushi'></i><span>Filamenten</span></a></li>
+            <li><a href="costs.php" class="<?= basename($_SERVER['PHP_SELF']) == 'costs.php' ? 'active' : '' ?>"><i class='bx bx-dollar'></i><span>Kosten</span></a></li>
+            <li><a href="printer.php"><i class='bx bx-printer'></i><span>Printer Beheer</span></a></li>
         </ul>
     </aside>
 
